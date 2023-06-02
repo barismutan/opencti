@@ -43,6 +43,8 @@ import type { ClusterConfig } from '../manager/clusterManager';
 
 export const REDIS_PREFIX = conf.get('redis:namespace') ? `${conf.get('redis:namespace')}:` : '';
 const USE_SSL = booleanConf('redis:use_ssl', false);
+
+const REDIS_AUTOTRIM = booleanConf('redis:autotrim', true)
 const REDIS_CA = conf.get('redis:ca').map((path: string) => readFileSync(path));
 export const REDIS_STREAM_NAME = `${REDIS_PREFIX}stream.opencti`;
 export const NOTIFICATION_STREAM_NAME = `${REDIS_PREFIX}stream.notification`;
@@ -645,6 +647,12 @@ export const createStreamProcessor = <T extends BaseEvent> (
         const [, results] = streamResult[0];
         const lastElementId = await processStreamResult(results, callback, opts.withInternal);
         startEventId = lastElementId || startEventId;
+
+        if(REDIS_AUTOTRIM){
+          logApp.info("Clearing Stream")
+          await client.call('XTRIM', REDIS_STREAM_NAME, 'MINID', startEventId)
+          logApp.info("Stream cleared")
+        }
       } else {
         await processStreamResult([], callback, opts.withInternal);
       }
