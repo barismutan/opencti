@@ -218,7 +218,7 @@ const EntityStixCoreRelationshipsHorizontalBars = (
       startDate: startDate || null,
       endDate: endDate || null,
       dateAttribute,
-      limit: 10,
+      limit: 30,
       operation: 'count',
       isTo: isTo || false,
     };

@@ -96,7 +96,7 @@ class SimpleStixObjectOrStixRelationshipStixCoreRelationships extends Component 
             query={
               simpleStixObjectOrStixRelationshipStixCoreRelationshipsLinesQuery
             }
-            variables={{ count: 8, ...paginationOptions }}
+            variables={{ count: 20, ...paginationOptions }}
             render={({ props }) => {
               if (props) {
                 return (
