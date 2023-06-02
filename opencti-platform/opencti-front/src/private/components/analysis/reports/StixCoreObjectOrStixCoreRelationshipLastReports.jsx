@@ -159,7 +159,7 @@ class StixCoreObjectOrStixCoreRelationshipLastReports extends Component {
           <QueryRenderer
             query={stixCoreObjectOrStixCoreRelationshipLastReportsQuery}
             variables={{
-              first: 20,
+              first: 8,
               orderBy: 'published',
               orderMode: 'desc',
               filters,

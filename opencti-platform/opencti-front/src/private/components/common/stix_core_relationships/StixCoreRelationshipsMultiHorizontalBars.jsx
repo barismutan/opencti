@@ -1,6 +1,5 @@
 import React from 'react';
 import { graphql } from 'react-relay';
-import Chart from 'react-apexcharts';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -8,6 +7,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { useNavigate } from 'react-router-dom-v5-compat';
+import Chart from '../charts/Chart';
 import { QueryRenderer } from '../../../../relay/environment';
 import { useFormatter } from '../../../../components/i18n';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
@@ -860,7 +860,7 @@ const StixCoreRelationshipsMultiHorizontalBars = ({
       startDate,
       endDate,
       dateAttribute: dateAttribute || dataSelectionDateAttribute,
-      limit: 20,
+      limit: 10,
       filters: finalFilters,
       isTo: selection.isTo,
       dynamicFrom: convertFilters(selection.dynamicFrom),
@@ -1035,6 +1035,7 @@ const StixCoreRelationshipsMultiHorizontalBars = ({
                 type="bar"
                 width="100%"
                 height="100%"
+                withExportPopover={true}
               />
             );
           }
@@ -1076,7 +1077,7 @@ const StixCoreRelationshipsMultiHorizontalBars = ({
         variant="h4"
         gutterBottom={true}
         style={{
-          margin: variant !== 'inLine' ? '0 0 10px 0' : '-10px 0 0 -7px',
+          margin: variant !== 'inLine' ? '0 0 10px 0' : '-10px 0 10px -7px',
         }}
       >
         {parameters.title || title || t('Relationships DISTRIBUTION')}
