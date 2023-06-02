@@ -649,7 +649,7 @@ export const createStreamProcessor = <T extends BaseEvent> (
         startEventId = lastElementId || startEventId;
 
         if(REDIS_AUTOTRIM){
-          logApp.info("Clearing Stream")
+          logApp.info("Clearing Stream until startEventId="+ startEventId)
           await client.call('XTRIM', REDIS_STREAM_NAME, 'MINID', startEventId)
           logApp.info("Stream cleared")
         }
