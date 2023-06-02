@@ -312,7 +312,7 @@ const StixCoreRelationshipsDistributionList = ({
       startDate,
       endDate,
       dateAttribute,
-      limit: 10,
+      limit: 20,
       filters: finalFilters,
       isTo: selection.isTo,
       dynamicFrom: convertFilters(selection.dynamicFrom),
@@ -414,7 +414,7 @@ const StixCoreRelationshipsDistributionList = ({
         variant="h4"
         gutterBottom={true}
         style={{
-          margin: variant !== 'inLine' ? '0 0 10px 0' : '-10px 0 10px -7px',
+          margin: variant !== 'inLine' ? '0 0 10px 0' : '-10px 0 0 -7px',
         }}
       >
         {parameters.title || title || t('Relationships distribution')}
