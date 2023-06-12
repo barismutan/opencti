@@ -48,6 +48,8 @@ const internalObjectsAttributes: { [k: string]: Array<AttributeDefinition> } = {
     { name: 'platform_theme_light_logo_login', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'platform_language', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'platform_login_message', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
+    { name: 'platform_consent_message', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
+    { name: 'platform_consent_confirm_text', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'otp_mandatory', type: 'boolean', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'password_policy_min_length', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'password_policy_max_length', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: false },
@@ -56,6 +58,8 @@ const internalObjectsAttributes: { [k: string]: Array<AttributeDefinition> } = {
     { name: 'password_policy_min_words', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'password_policy_min_lowercase', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: false },
     { name: 'password_policy_min_uppercase', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: false },
+    { name: 'enterprise_edition', type: 'date', mandatoryType: 'no', multiple: false, upsert: false },
+    { name: 'activity_listeners_ids', type: 'string', mandatoryType: 'no', multiple: true, upsert: false },
   ],
   [ENTITY_TYPE_MIGRATION_STATUS]: [
     { name: 'lastRun', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },

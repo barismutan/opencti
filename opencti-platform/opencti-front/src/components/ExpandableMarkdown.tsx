@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/styles';
 import { truncate } from '../utils/String';
 import { Theme } from './Theme';
+import FieldOrEmpty from './FieldOrEmpty';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MarkDownComponents = (theme: Theme): Record<string, FunctionComponent<any>> => ({
@@ -56,28 +57,28 @@ const ExpandableMarkdown: FunctionComponent<ExpandableMarkdownProps> = ({ source
 
   return (
     <span>
-    {source
-      ? <div style={{ position: 'relative' }}>
-        {shouldBeTruncated && (
-          <div style={{ position: 'absolute', top: -32, right: 0 }}>
-            <IconButton onClick={onClick} size="large">
-              {expand ? <ExpandLess/> : <ExpandMore/>}
-            </IconButton>
+        <FieldOrEmpty source={source}>
+          <div style={{ position: 'relative' }}>
+            {shouldBeTruncated && (
+                <div style={{ position: 'absolute', top: -32, right: 0 }}>
+                    <IconButton onClick={onClick} size="large">
+                        {expand ? <ExpandLess /> : <ExpandMore />}
+                    </IconButton>
+                </div>
+            )}
+              <div style={{ marginTop: 10 }}>
+              <Markdown
+                  remarkPlugins={[remarkGfm, remarkParse]}
+                  components={MarkDownComponents(theme)}
+                  className="markdown"
+              >
+                {expand ? source : truncate(source, limit)}
+              </Markdown>
+            </div>
+            <div className="clearfix" />
           </div>
-        )}
-        <div style={{ marginTop: 10 }}>
-          <Markdown
-            remarkPlugins={[remarkGfm, remarkParse]}
-            components={MarkDownComponents(theme)}
-            className="markdown"
-          >
-            {expand ? source : truncate(source, limit)}
-          </Markdown>
-        </div>
-        <div className="clearfix"/>
-      </div>
-      : ('-')
-    }
+        </FieldOrEmpty>
+
     </span>
   );
 };

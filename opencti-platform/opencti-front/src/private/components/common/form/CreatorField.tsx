@@ -7,6 +7,7 @@ import AutocompleteField from '../../../../components/AutocompleteField';
 import { useFormatter } from '../../../../components/i18n';
 import { CreatorFieldSearchQuery$data } from './__generated__/CreatorFieldSearchQuery.graphql';
 import ItemIcon from '../../../../components/ItemIcon';
+import { Option } from './ReferenceField';
 
 const useStyles = makeStyles(() => ({
   icon: {
@@ -26,14 +27,14 @@ const useStyles = makeStyles(() => ({
 interface CreatorFieldProps {
   name: string;
   label: string;
-  onChange?: (name: string, value: unknown) => void;
+  onChange?: (name: string, value: Option) => void;
   containerStyle?: Record<string, string | number>;
   helpertext?: string;
 }
 
 const CreatorFieldQuery = graphql`
   query CreatorFieldSearchQuery($search: String) {
-    creators(search: $search) {
+    members(search: $search, entityTypes: [User]) {
       edges {
         node {
           id
@@ -67,7 +68,7 @@ const CreatorField: FunctionComponent<CreatorFieldProps> = ({
       .toPromise()
       .then((data) => {
         const NewCreators = (
-          (data as CreatorFieldSearchQuery$data)?.creators?.edges ?? []
+          (data as CreatorFieldSearchQuery$data)?.members?.edges ?? []
         ).map((n) => ({
           label: n?.node.name,
           value: n?.node.id,

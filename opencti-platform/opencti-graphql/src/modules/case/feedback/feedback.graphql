@@ -92,6 +92,7 @@ type Feedback implements BasicObject & StixObject & StixCoreObject & StixDomainO
   x_opencti_graph_data: String
   objectAssignee: AssigneeConnection
   # Container
+  representative: String!
   objects(
     first: Int
     after: ID
@@ -128,6 +129,8 @@ type Feedback implements BasicObject & StixObject & StixCoreObject & StixDomainO
   # Cases
   name: String!
   description: String
+  content: String
+  content_mapping: String
   tasks: CaseTaskConnection!
   # Feedback
   rating: Int
@@ -207,6 +210,8 @@ input FeedbackAddInput {
   x_opencti_stix_ids: [StixId]
   name: String! @constraint(minLength: 2)
   description: String
+  content: String
+  content_mapping: String
   confidence: Int
   revoked: Boolean
   lang: String

@@ -55,7 +55,7 @@ import {
   elUpdateRelationConnections,
   ES_MAX_CONCURRENCY,
   isImpactedTypeAndSide,
-  MAX_SPLIT,
+  MAX_BULK_OPERATIONS,
   ROLE_FROM,
   ROLE_TO,
 } from './engine';
@@ -836,7 +836,7 @@ const computeConfidenceLevel = (input) => {
   }
   return confidence;
 };
-const updatedInputsToData = (instance, inputs) => {
+export const updatedInputsToData = (instance, inputs) => {
   const inputPairs = R.map((input) => {
     const { key, value } = input;
     let val = value;
@@ -1149,7 +1149,7 @@ const mergeEntitiesRaw = async (context, user, targetEntity, sourceEntities, tar
   // Update all impacted relations.
   logApp.info(`[OPENCTI] Merging updating ${updateConnections.length} relations for ${targetEntity.internal_id}`);
   let currentRelsUpdateCount = 0;
-  const groupsOfRelsUpdate = R.splitEvery(MAX_SPLIT, updateConnections);
+  const groupsOfRelsUpdate = R.splitEvery(MAX_BULK_OPERATIONS, updateConnections);
   const concurrentRelsUpdate = async (connsToUpdate) => {
     await elUpdateRelationConnections(connsToUpdate);
     currentRelsUpdateCount += connsToUpdate.length;
@@ -1168,7 +1168,7 @@ const mergeEntitiesRaw = async (context, user, targetEntity, sourceEntities, tar
     .filter(([, values]) => values.length === 1)
     .map(([, values]) => values)
     .flat();
-  const groupsOfEntityUpdate = R.splitEvery(MAX_SPLIT, updateBulkEntities);
+  const groupsOfEntityUpdate = R.splitEvery(MAX_BULK_OPERATIONS, updateBulkEntities);
   const concurrentEntitiesUpdate = async (entitiesToUpdate) => {
     await elUpdateEntityConnections(entitiesToUpdate);
     currentEntUpdateCount += entitiesToUpdate.length;
@@ -2463,8 +2463,8 @@ const upsertElementRaw = async (context, user, element, type, updatePatch) => {
   }
   // If file directly attached
   if (!isEmptyField(updatePatch.file)) {
-    const meta = { entity_id: element.internal_id };
-    const file = await upload(context, user, `import/${element.entity_type}/${element.internal_id}`, updatePatch.file, meta);
+    const path = `import/${element.entity_type}/${element.internal_id}`;
+    const file = await upload(context, user, path, updatePatch.file, { entity: element });
     const convertedFile = storeFileConverter(user, file);
     // The patch for message generation is just an add
     const filePatch = { key: 'x_opencti_files', value: [convertedFile], operation: UPDATE_OPERATION_ADD };
@@ -2789,6 +2789,9 @@ export const createRelationRaw = async (context, user, input, opts = {}) => {
       }
       // TODO Handling merging relation when updating to prevent multiple relations finding
       existingRelationship = R.head(filteredRelations);
+      // We can use the resolved input from/to to complete the element
+      existingRelationship.from = from;
+      existingRelationship.to = to;
     }
     // endregion
     let dataRel;
@@ -3017,24 +3020,24 @@ const buildEntityData = async (context, user, input, type, opts = {}) => {
   }
 
   // Transaction succeed, complete the result to send it back
-  const created = R.pipe(
+  const entity = R.pipe(
     R.assoc('id', internalId),
     R.assoc('base_type', BASE_TYPE_ENTITY),
     R.assoc('parent_types', getParentTypes(type))
   )(data);
   // If file directly attached
   if (!isEmptyField(input.file)) {
-    const meta = { entity_id: created.internal_id };
-    const file = await upload(context, user, `import/${created.entity_type}/${created.internal_id}`, input.file, meta);
-    created.x_opencti_files = [storeFileConverter(user, file)];
+    const path = `import/${entity.entity_type}/${entity.internal_id}`;
+    const file = await upload(context, user, path, input.file, { entity });
+    entity.x_opencti_files = [storeFileConverter(user, file)];
   }
 
   // Simply return the data
   return {
     type: TRX_CREATION,
     update: null,
-    element: created,
-    message: generateCreateMessage(created),
+    element: entity,
+    message: generateCreateMessage(entity),
     previous: null,
     relations: relToCreate, // Added meta relationships
   };
@@ -3173,6 +3176,7 @@ const createEntityRaw = async (context, user, input, type, opts = {}) => {
 };
 
 export const createEntity = async (context, user, input, type, opts = {}) => {
+  const isCompleteResult = opts.complete === true;
   // volumes of objects relationships must be controlled
   if (input.objects && input.objects.length > MAX_BATCH_SIZE) {
     const objectSequences = R.splitEvery(MAX_BATCH_SIZE, input.objects);
@@ -3186,14 +3190,14 @@ export const createEntity = async (context, user, input, type, opts = {}) => {
       const upsertInput = R.assoc(INPUT_OBJECTS, objectSequence, input);
       await createEntityRaw(context, user, upsertInput, type, opts);
     }
-    return created.element;
+    return isCompleteResult ? created : created.element;
   }
   const data = await createEntityRaw(context, user, input, type, opts);
   // In case of creation, start an enrichment
   if (data.isCreation) {
     await createEntityAutoEnrichment(context, user, data.element.id, type);
   }
-  return data.element;
+  return isCompleteResult ? data : data.element;
 };
 export const createInferredEntity = async (context, input, ruleContent, type) => {
   const opts = {
@@ -3391,6 +3395,6 @@ export const deleteRelationsByFromAndTo = async (context, user, fromId, toId, re
     const r = relationsToDelete[i];
     await deleteElementById(context, user, r.internal_id, r.entity_type, opts);
   }
-  return true;
+  return { from: fromThing, to: toThing, deletions: relationsToDelete };
 };
 // endregion

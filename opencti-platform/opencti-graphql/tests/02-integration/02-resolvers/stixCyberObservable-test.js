@@ -82,7 +82,7 @@ describe('StixCyberObservable resolver standard behavior', () => {
   });
   it('should list stixCyberObservables', async () => {
     const queryResult = await queryAsAdmin({ query: LIST_QUERY, variables: { first: 10 } });
-    expect(queryResult.data.stixCyberObservables.edges.length).toEqual(2);
+    expect(queryResult.data.stixCyberObservables.edges.length).toEqual(3);
   });
   it('should update stixCyberObservable', async () => {
     const UPDATE_QUERY = gql`
@@ -198,7 +198,7 @@ describe('StixCyberObservable resolver standard behavior', () => {
   });
   it('should add observable in note', async () => {
     const CREATE_QUERY = gql`
-        mutation NoteAdd($input: NoteAddInput) {
+        mutation NoteAdd($input: NoteAddInput!) {
             noteAdd(input: $input) {
                 id
                 attribute_abstract

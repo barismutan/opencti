@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMde from 'react-mde';
 import { useField } from 'formik';
 import Markdown from 'react-markdown';
@@ -6,8 +6,9 @@ import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
+import remarkFlexibleMarkers from 'remark-flexible-markers';
 import * as R from 'ramda';
-import inject18n from './i18n';
+import { useFormatter } from './i18n';
 
 const MarkDownField = (props) => {
   const {
@@ -15,12 +16,16 @@ const MarkDownField = (props) => {
     field: { name },
     onFocus,
     onSubmit,
+    onSelect,
     label,
     style,
     disabled,
-    t,
+    controlledSelectedTab,
+    controlledSetSelectTab,
+    height,
   } = props;
-  const [selectedTab, setSelectedTab] = React.useState('write');
+  const { t } = useFormatter();
+  const [selectedTab, setSelectedTab] = useState('write');
   const [field, meta] = useField(name);
   const internalOnFocus = (event) => {
     const { nodeName } = event.relatedTarget || {};
@@ -39,13 +44,17 @@ const MarkDownField = (props) => {
       }
     }
   };
+  const internalOnSelect = () => {
+    const selection = window.getSelection().toString();
+    if (typeof onSelect === 'function' && selection.length > 2 && disabled) {
+      onSelect(selection.trim());
+    }
+  };
   return (
-    <div
-      style={style}
+    <div style={style}
       className={!R.isNil(meta.error) ? 'error' : 'main'}
       onBlur={internalOnBlur}
-      onFocus={internalOnFocus}
-    >
+      onFocus={internalOnFocus}>
       <InputLabel shrink={true} variant="standard">
         {label}
       </InputLabel>
@@ -53,23 +62,27 @@ const MarkDownField = (props) => {
         value={field.value}
         readOnly={disabled}
         onChange={(value) => setFieldValue(name, value)}
-        selectedTab={selectedTab}
-        onTabChange={setSelectedTab}
+        selectedTab={controlledSelectedTab || selectedTab}
+        onTabChange={(tab) => (controlledSetSelectTab ? controlledSetSelectTab(tab) : setSelectedTab(tab))}
         generateMarkdownPreview={(markdown) => Promise.resolve(
-            <Markdown
-              remarkPlugins={[remarkGfm, remarkParse]}
-              parserOptions={{ commonmark: true }}
-            >
-              {markdown}
-            </Markdown>,
-        )
-        }
+            <div onMouseUp={() => internalOnSelect()}>
+              <Markdown remarkPlugins={[remarkGfm, remarkParse, remarkFlexibleMarkers]}
+                parserOptions={{ commonmark: true }}>
+                {markdown}
+              </Markdown>
+            </div>,
+        )}
         l18n={{
           write: t('Write'),
           preview: t('Preview'),
           uploadingImage: t('Uploading image'),
           pasteDropSelect: t('Paste'),
         }}
+        childProps={{
+          textArea: { onSelect: internalOnSelect },
+        }}
+        minEditorHeight={height || 100}
+        maxEditorHeight={height || 100}
       />
       {!R.isNil(meta.error) && (
         <FormHelperText error={true}>{meta.error}</FormHelperText>
@@ -78,4 +91,4 @@ const MarkDownField = (props) => {
   );
 };
 
-export default inject18n(MarkDownField);
+export default MarkDownField;

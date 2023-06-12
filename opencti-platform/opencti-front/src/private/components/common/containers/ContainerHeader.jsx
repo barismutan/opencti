@@ -3,16 +3,20 @@ import { createFragmentContainer, graphql } from 'react-relay';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 import Tooltip from '@mui/material/Tooltip';
-import { GraphOutline, VectorLink, ChartTimeline } from 'mdi-material-ui';
+import { ChartTimeline, GraphOutline, VectorLink } from 'mdi-material-ui';
 import {
   AddTaskOutlined,
   AssistantOutlined,
   ViewColumnOutlined,
+  DifferenceOutlined,
 } from '@mui/icons-material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { DialogTitle } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import Markdown from 'react-markdown';
 import DialogContent from '@mui/material/DialogContent';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -25,14 +29,12 @@ import Button from '@mui/material/Button';
 import Slide from '@mui/material/Slide';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import Markdown from 'react-markdown';
 import CircularProgress from '@mui/material/CircularProgress';
 import { makeStyles, useTheme } from '@mui/styles';
 import ExportButtons from '../../../../components/ExportButtons';
 import Security from '../../../../utils/Security';
 import { useFormatter } from '../../../../components/i18n';
+import { MarkDownComponents } from '../../../../components/ExpandableMarkdown';
 import { truncate } from '../../../../utils/String';
 import {
   commitMutation,
@@ -41,7 +43,6 @@ import {
 } from '../../../../relay/environment';
 import { defaultValue } from '../../../../utils/Graph';
 import { stixCoreRelationshipCreationMutation } from '../stix_core_relationships/StixCoreRelationshipCreation';
-import { MarkDownComponents } from '../../../../components/ExpandableMarkdown';
 import { containerAddStixCoreObjectsLinesRelationAddMutation } from './ContainerAddStixCoreObjectsLines';
 import StixCoreObjectSharing from '../stix_core_objects/StixCoreObjectSharing';
 import useGranted, {
@@ -118,6 +119,7 @@ export const containerHeaderObjectsQuery = graphql`
       }
       objects(all: true) {
         edges {
+          types
           node {
             ... on BasicObject {
               id
@@ -498,24 +500,68 @@ const ContainerHeader = (props) => {
   const [applying, setApplying] = useState([]);
   const [applied, setApplied] = useState([]);
   // Suggestions
-  const resolveThreats = (objects) => objects.filter((o) => [
-    'Threat-Actor',
-    'Intrusion-Set',
-    'Campaign',
-    'Incident',
-    'Malware',
-    'Tool',
-  ].includes(o.entity_type));
-  const resolveIndicators = (objects) => objects.filter((o) => ['Indicator'].includes(o.entity_type));
+  const resolveThreats = (objects) => objects.filter(
+    (o) => [
+      'Threat-Actor',
+      'Intrusion-Set',
+      'Campaign',
+      'Incident',
+      'Malware',
+      'Tool',
+    ].includes(o.entity_type) && o.types.includes('manual'),
+  );
+  const resolveIndicators = (objects) => objects.filter(
+    (o) => ['Indicator'].includes(o.entity_type) && o.types.includes('manual'),
+  );
+  const resolveArsenal = (objects) => objects.filter(
+    (o) => ['Attack-Pattern', 'Malware', 'Tool', 'Channel', 'Narrative'].includes(
+      o.entity_type,
+    ) && o.types.includes('manual'),
+  );
+  const resolveTargets = (objects) => objects.filter(
+    (o) => [
+      'Sector',
+      'Region',
+      'Country',
+      'City',
+      'Position',
+      'Organization',
+      'System',
+      'Individual',
+      'Vulnerability',
+    ].includes(o.entity_type) && o.types.includes('manual'),
+  );
+  const setAppliedSuggestion = (suggestion) => {
+    const appliedSuggestions = JSON.parse(
+      localStorage.getItem(`suggestions-rules-${container.id}`) || '[]',
+    );
+    localStorage.setItem(
+      `suggestions-rules-${container.id}`,
+      JSON.stringify([...appliedSuggestions, suggestion]),
+    );
+  };
+  const getAppliedSuggestions = () => {
+    return JSON.parse(
+      localStorage.getItem(`suggestions-rules-${container.id}`) || '[]',
+    );
+  };
   const generateSuggestions = (objects) => {
     const suggestions = [];
     const resolvedThreats = resolveThreats(objects);
-    // First rule, threats and indicators
-    if (
-      resolvedThreats.length > 0
-      && objects.filter((o) => o.entity_type === 'Indicator').length > 0
-    ) {
+    const resolvedIndicators = resolveIndicators(objects);
+    const resolvedArsenal = resolveArsenal(objects);
+    const resolvedTargets = resolveTargets(objects);
+    // Threats and indicators
+    if (resolvedThreats.length > 0 && resolvedIndicators.length > 0) {
       suggestions.push({ type: 'threats-indicators', data: resolvedThreats });
+    }
+    // Threats and arsenal
+    if (resolvedThreats.length > 0 && resolvedArsenal.length > 0) {
+      suggestions.push({ type: 'threats-arsenal', data: resolvedThreats });
+    }
+    // Threats and targets
+    if (resolvedThreats.length > 0 && resolvedTargets.length > 0) {
+      suggestions.push({ type: 'threats-targets', data: resolvedThreats });
     }
     return suggestions;
   };
@@ -528,9 +574,9 @@ const ContainerHeader = (props) => {
     if (type === 'threats-indicators' && selectedEntity) {
       // create all indicates relationships
       setApplying([...applying, type]);
-      const indicators = resolveIndicators(objects);
+      const resolvedIndicators = resolveIndicators(objects);
       const createdRelationships = await Promise.all(
-        indicators.map((indicator) => {
+        resolvedIndicators.map((indicator) => {
           const values = {
             relationship_type: 'indicates',
             confidence: container.confidence,
@@ -569,15 +615,114 @@ const ContainerHeader = (props) => {
         }),
       );
       MESSAGING$.notifySuccess('Suggestion successfully applied.');
-      localStorage.setItem(`suggestions-${container.id}`, [
-        ...(localStorage.getItem(`suggestions-${container.id}`) || []),
-        type,
-      ]);
-      if (onApplied) {
-        onApplied();
-      }
+      setAppliedSuggestion(type);
       setApplied([...applied, type]);
       setApplying(applying.filter((n) => n !== type));
+      if (onApplied) {
+        return onApplied(createdRelationships);
+      }
+    }
+    if (type === 'threats-arsenal' && selectedEntity) {
+      // create all targets relationships
+      setApplying([...applying, type]);
+      const resolvedArsenal = resolveArsenal(objects);
+      const createdRelationships = await Promise.all(
+        resolvedArsenal.map((arsenal) => {
+          const values = {
+            relationship_type: 'uses',
+            confidence: container.confidence,
+            fromId: selectedEntity[type],
+            toId: arsenal.id,
+            createdBy: container.createdBy?.id,
+            objectMarking: container.objectMarking.edges.map((m) => m.node.id),
+          };
+          return new Promise((resolve) => {
+            commitMutation({
+              mutation: stixCoreRelationshipCreationMutation,
+              variables: {
+                input: values,
+              },
+              onCompleted: (response) => resolve(response.stixCoreRelationshipAdd),
+            });
+          });
+        }),
+      );
+      await Promise.all(
+        createdRelationships.map((createdRelationship) => {
+          const input = {
+            toId: createdRelationship.id,
+            relationship_type: 'object',
+          };
+          return new Promise((resolve) => {
+            commitMutation({
+              mutation: containerAddStixCoreObjectsLinesRelationAddMutation,
+              variables: {
+                id: container.id,
+                input,
+              },
+              onCompleted: (response) => resolve(response.containerEdit.relationAdd),
+            });
+          });
+        }),
+      );
+      MESSAGING$.notifySuccess('Suggestion successfully applied.');
+      setAppliedSuggestion(type);
+      setApplied([...applied, type]);
+      setApplying(applying.filter((n) => n !== type));
+      if (onApplied) {
+        return onApplied(createdRelationships);
+      }
+    }
+    if (type === 'threats-targets' && selectedEntity) {
+      // create all targets relationships
+      setApplying([...applying, type]);
+      const resolvedTargets = resolveTargets(objects);
+      const createdRelationships = await Promise.all(
+        resolvedTargets.map((target) => {
+          const values = {
+            relationship_type: 'targets',
+            confidence: container.confidence,
+            fromId: selectedEntity[type],
+            toId: target.id,
+            createdBy: container.createdBy?.id,
+            objectMarking: container.objectMarking.edges.map((m) => m.node.id),
+          };
+          return new Promise((resolve) => {
+            commitMutation({
+              mutation: stixCoreRelationshipCreationMutation,
+              variables: {
+                input: values,
+              },
+              onCompleted: (response) => resolve(response.stixCoreRelationshipAdd),
+            });
+          });
+        }),
+      );
+      await Promise.all(
+        createdRelationships.map((createdRelationship) => {
+          const input = {
+            toId: createdRelationship.id,
+            relationship_type: 'object',
+          };
+          return new Promise((resolve) => {
+            commitMutation({
+              mutation: containerAddStixCoreObjectsLinesRelationAddMutation,
+              variables: {
+                id: container.id,
+                input,
+              },
+              onCompleted: (response) => resolve(response.containerEdit.relationAdd),
+            });
+          });
+        }),
+      );
+      MESSAGING$.notifySuccess('Suggestion successfully applied.');
+      setAppliedSuggestion(type);
+      setApplied([...applied, type]);
+      setApplying(applying.filter((n) => n !== type));
+      if (onApplied) {
+        return onApplied(createdRelationships);
+      }
     }
   };
   return (
@@ -640,6 +785,20 @@ const ContainerHeader = (props) => {
                 </ToggleButton>
               </Tooltip>
             )}
+            {modes.includes('content') && (
+              <Tooltip title={t('Content mapping view')}>
+                <ToggleButton
+                  component={Link}
+                  to={`${link}/content`}
+                  selected={currentMode === 'content'}
+                >
+                  <DifferenceOutlined
+                    fontSize="small"
+                    color={currentMode === 'content' ? 'secondary' : 'primary'}
+                  />
+                </ToggleButton>
+              </Tooltip>
+            )}
             {modes.includes('timeline') && (
               <Tooltip title={t('TimeLine view')}>
                 <ToggleButton
@@ -694,9 +853,12 @@ const ContainerHeader = (props) => {
           render={({ props: containerProps }) => {
             if (containerProps && containerProps.container) {
               const suggestions = generateSuggestions(
-                containerProps.container.objects.edges.map((o) => o.node),
+                containerProps.container.objects.edges.map((o) => ({
+                  ...o.node,
+                  types: o.types,
+                })),
               );
-              const appliedSuggestions = localStorage.getItem(`suggestions-${container.id}`) || [];
+              const appliedSuggestions = getAppliedSuggestions();
               if (userIsKnowledgeEditor) {
                 return (
                   <React.Fragment>
@@ -782,6 +944,7 @@ const ContainerHeader = (props) => {
                               <Select
                                 style={{
                                   width: 200,
+                                  minWidth: 200,
                                   margin: '0 0 0 15px',
                                 }}
                                 variant="standard"
@@ -802,7 +965,10 @@ const ContainerHeader = (props) => {
                                   onClick={() => applySuggestion(
                                     suggestion.type,
                                     containerProps.container.objects.edges.map(
-                                      (o) => o.node,
+                                      (o) => ({
+                                        ...o.node,
+                                        types: o.types,
+                                      }),
                                     ),
                                   )
                                   }

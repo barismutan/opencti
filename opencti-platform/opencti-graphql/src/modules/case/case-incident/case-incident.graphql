@@ -92,6 +92,7 @@ type CaseIncident implements BasicObject & StixObject & StixCoreObject & StixDom
   x_opencti_graph_data: String
   objectAssignee: AssigneeConnection
   # Container
+  representative: String!
   objects(
     first: Int
     after: ID
@@ -128,6 +129,8 @@ type CaseIncident implements BasicObject & StixObject & StixCoreObject & StixDom
   # Cases
   name: String!
   description: String
+  content: String
+  content_mapping: String
   tasks: CaseTaskConnection!
   # Incident Response
   rating: Int
@@ -214,6 +217,8 @@ input CaseIncidentAddInput {
   severity: String
   priority: String
   description: String
+  content: String
+  content_mapping: String
   confidence: Int
   revoked: Boolean
   lang: String

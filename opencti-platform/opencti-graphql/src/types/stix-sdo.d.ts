@@ -211,8 +211,8 @@ export interface StixNote extends StixContainer {
 // Observed Data Specific Properties
 // first_observed, last_observed, number_observed, objects, object_refs
 export interface StixObservedData extends StixContainer {
-  first_observed: Date
-  last_observed: Date
+  first_observed: StixDate
+  last_observed: StixDate
   number_observed: number
 }
 
@@ -226,11 +226,20 @@ export interface StixOpinion extends StixContainer {
 
 // Report Specific Properties
 // name, description, report_types, published, object_refs
+export interface StixReportExtension extends StixOpenctiExtension {
+  content: string;
+  content_mapping: string;
+  object_refs_inferred?: Array<StixId>; // optional
+}
+
 export interface StixReport extends StixContainer {
   name: string
   description: string
   report_types: Array<string>
-  published: Date
+  published: StixDate
+  extensions: {
+    [STIX_EXT_OCTI]: StixReportExtension;
+  };
 }
 
 // Threat Actor Specific Properties

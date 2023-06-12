@@ -15,10 +15,11 @@ import {
 import { listEntities, storeLoadById } from '../database/middleware-loader';
 import { delEditContext, notify, setEditContext } from '../database/redis';
 import { BUS_TOPICS } from '../config/conf';
-import { ABSTRACT_INTERNAL_RELATIONSHIP, BASE_TYPE_ENTITY } from '../schema/general';
+import { ABSTRACT_INTERNAL_RELATIONSHIP, BASE_TYPE_ENTITY, buildRefRelationKey } from '../schema/general';
 import { getParentTypes } from '../schema/schemaUtils';
 import { RELATION_ACCESSES_TO } from '../schema/internalRelationship';
-import { SYSTEM_USER } from '../utils/access';
+import { isUserHasCapability, SYSTEM_USER, TAXIIAPI_SETCOLLECTIONS } from '../utils/access';
+import { publishUserAction } from '../listener/UserActionListener';
 
 // Stream graphQL handlers
 export const createStreamCollection = async (context, user, input) => {
@@ -35,6 +36,13 @@ export const createStreamCollection = async (context, user, input) => {
     ...R.dissoc('groups', input),
   };
   await elIndex(INDEX_INTERNAL_OBJECTS, data);
+  await publishUserAction({
+    user,
+    event_type: 'admin',
+    status: 'success',
+    message: `creates live stream \`${data.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_STREAM_COLLECTION, operation: 'create', input }
+  });
   // Create groups relations
   const relBuilder = (g) => ({ fromId: g, toId: collectionId, relationship_type: RELATION_ACCESSES_TO });
   await createRelations(context, user, relatedGroups.map((g) => relBuilder(g)));
@@ -47,37 +55,66 @@ export const findById = async (context, user, collectionId) => {
   return storeLoadById(context, user, collectionId, ENTITY_TYPE_STREAM_COLLECTION);
 };
 export const deleteGroupRelation = async (context, user, collectionId, groupId) => {
-  await deleteRelationsByFromAndTo(context, user, groupId, collectionId, RELATION_ACCESSES_TO, ABSTRACT_INTERNAL_RELATIONSHIP);
+  const { to } = await deleteRelationsByFromAndTo(context, user, groupId, collectionId, RELATION_ACCESSES_TO, ABSTRACT_INTERNAL_RELATIONSHIP);
+  await publishUserAction({
+    user,
+    event_type: 'admin',
+    status: 'success',
+    message: `updates \`groups\` for live stream \`${to.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_STREAM_COLLECTION, operation: 'update', input: { id: groupId, operation: 'remove' } }
+  });
   return findById(context, user, collectionId);
 };
 export const createGroupRelation = async (context, user, collectionId, groupId) => {
-  await createRelation(context, user, { fromId: groupId, toId: collectionId, relationship_type: RELATION_ACCESSES_TO });
+  const { to } = await createRelation(context, user, { fromId: groupId, toId: collectionId, relationship_type: RELATION_ACCESSES_TO });
+  await publishUserAction({
+    user,
+    event_type: 'admin',
+    status: 'success',
+    message: `updates \`groups\` for live stream \`${to.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_STREAM_COLLECTION, operation: 'update', input: { id: groupId, operation: 'add' } }
+  });
   return findById(context, user, collectionId);
 };
 export const findAll = (context, user, args) => {
+  // If user is logged, list all streams where the user have access.
   if (user) {
-    return listEntities(context, user, [ENTITY_TYPE_STREAM_COLLECTION], args);
-  }
-  return listEntities(
-    context,
-    SYSTEM_USER,
-    [ENTITY_TYPE_STREAM_COLLECTION],
-    {
-      ...(args ?? {}),
-      filters: [
-        ...(args?.filters ?? []),
-        { key: ['stream_public'], values: ['true'] },
-      ],
+    // If user can manage the feeds, list everything
+    if (isUserHasCapability(user, TAXIIAPI_SETCOLLECTIONS)) {
+      return listEntities(context, user, [ENTITY_TYPE_STREAM_COLLECTION], args);
     }
-  );
+    // If user has no right to manage streams, only list the stream without groups or with correct groups
+    const userGroupIds = (user.groups ?? []).map((g) => g.id);
+    const accessFilter = { key: [buildRefRelationKey(RELATION_ACCESSES_TO)], values: [...userGroupIds, null] };
+    const userArgs = { ...(args ?? {}), filters: [...(args?.filters ?? []), accessFilter] };
+    return listEntities(context, user, [ENTITY_TYPE_STREAM_COLLECTION], userArgs);
+  }
+  // No user specify, listing only public streams
+  const publicFilter = { key: ['stream_public'], values: ['true'] };
+  const publicArgs = { ...(args ?? {}), filters: [...(args?.filters ?? []), publicFilter] };
+  return listEntities(context, SYSTEM_USER, [ENTITY_TYPE_STREAM_COLLECTION], publicArgs);
 };
 export const streamCollectionEditField = async (context, user, collectionId, input) => {
   const { element } = await updateAttribute(context, user, collectionId, ENTITY_TYPE_STREAM_COLLECTION, input);
+  await publishUserAction({
+    user,
+    event_type: 'admin',
+    status: 'success',
+    message: `updates \`${input.map((i) => i.key).join(', ')}\` for live stream \`${element.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_STREAM_COLLECTION, operation: 'update', input }
+  });
   return notify(BUS_TOPICS[ENTITY_TYPE_STREAM_COLLECTION].EDIT_TOPIC, element, user);
 };
 export const streamCollectionDelete = async (context, user, collectionId) => {
-  const element = await deleteElementById(context, user, collectionId, ENTITY_TYPE_STREAM_COLLECTION);
-  await notify(BUS_TOPICS[ENTITY_TYPE_STREAM_COLLECTION].DELETE_TOPIC, element, user);
+  const deleted = await deleteElementById(context, user, collectionId, ENTITY_TYPE_STREAM_COLLECTION);
+  await publishUserAction({
+    user,
+    event_type: 'admin',
+    status: 'success',
+    message: `deletes live stream \`${deleted.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_STREAM_COLLECTION, operation: 'delete', input: deleted }
+  });
+  await notify(BUS_TOPICS[ENTITY_TYPE_STREAM_COLLECTION].DELETE_TOPIC, deleted, user);
   return collectionId;
 };
 export const streamCollectionCleanContext = async (context, user, collectionId) => {

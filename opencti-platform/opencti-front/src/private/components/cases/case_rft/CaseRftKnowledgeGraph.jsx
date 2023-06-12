@@ -37,13 +37,15 @@ import EntitiesDetailsRightsBar from '../../../../utils/graph/EntitiesDetailsRig
 import { hexToRGB } from '../../../../utils/Colors';
 import {
   caseRftKnowledgeGraphMutationRelationDeleteMutation,
-  caseRftKnowledgeGraphQueryStixObjectDeleteMutation, caseRftKnowledgeGraphQueryStixRelationshipDeleteMutation,
-  caseRftKnowledgeGraphtMutationRelationAddMutation } from './CaseRftKnowledgeGraphQuery';
+  caseRftKnowledgeGraphQueryStixObjectDeleteMutation,
+  caseRftKnowledgeGraphQueryStixRelationshipDeleteMutation,
+  caseRftKnowledgeGraphtMutationRelationAddMutation,
+} from './CaseRftKnowledgeGraphQuery';
 import CaseRftKnowledgeGraphBar from './CaseRftKnowledgeGraphBar';
 import CaseRftPopover from './CaseRftPopover';
 import { caseRftMutationFieldPatch } from './CaseRftEditionOverview';
 
-const ignoredStixCoreObjectsTypes = ['Incident', 'Note', 'Opinion'];
+const ignoredStixCoreObjectsTypes = ['Case-Rft', 'Note', 'Opinion'];
 
 const PARAMETERS$ = new Subject().pipe(debounce(() => timer(2000)));
 const POSITIONS$ = new Subject().pipe(debounce(() => timer(2000)));
@@ -463,7 +465,7 @@ class CaseRftKnowledgeGraphComponent extends Component {
     const params = buildViewParamsFromUrlAndStorage(
       props.history,
       props.location,
-      `view-case-rfts-${this.props.caseData.id}-knowledge`,
+      `view-case-rft-${this.props.caseData.id}-knowledge`,
     );
     this.zoom = R.propOr(null, 'zoom', params);
     this.graphObjects = props.caseData.objects.edges.map((n) => ({
@@ -792,7 +794,7 @@ class CaseRftKnowledgeGraphComponent extends Component {
           keyword: '',
         },
         () => {
-          this.saveParameters(false);
+          this.saveParameters(true);
           resolve(true);
         },
       );
@@ -1005,7 +1007,7 @@ class CaseRftKnowledgeGraphComponent extends Component {
           ) {
             commitMutation({
               mutation:
-              caseRftKnowledgeGraphQueryStixRelationshipDeleteMutation,
+                caseRftKnowledgeGraphQueryStixRelationshipDeleteMutation,
               variables: {
                 id: n.id,
               },
@@ -1272,8 +1274,28 @@ class CaseRftKnowledgeGraphComponent extends Component {
     );
   }
 
-  handleApplySuggestion() {
-    this.forceUpdate();
+  async handleApplySuggestion(createdRelationships) {
+    this.graphObjects = [...this.graphObjects, ...createdRelationships];
+    this.graphData = buildGraphData(
+      this.graphObjects,
+      decodeGraphData(this.props.caseData.x_opencti_graph_data),
+      this.props.t,
+    );
+    await this.resetAllFilters();
+    const selectedTimeRangeInterval = computeTimeRangeInterval(
+      this.graphObjects,
+    );
+    this.setState({
+      selectedTimeRangeInterval,
+      graphData: applyFilters(
+        this.graphData,
+        this.state.stixCoreObjectsTypes,
+        this.state.markedBy,
+        this.state.createdBy,
+        ignoredStixCoreObjectsTypes,
+        selectedTimeRangeInterval,
+      ),
+    });
   }
 
   handleTimeRangeChange(selectedTimeRangeInterval) {
@@ -1343,11 +1365,11 @@ class CaseRftKnowledgeGraphComponent extends Component {
           container={caseData}
           PopoverComponent={<CaseRftPopover id={caseData.id} />}
           link={`/dashboard/cases/rfts/${caseData.id}/knowledge`}
-          modes={['graph', 'timeline', 'correlation', 'matrix']}
+          modes={['graph', 'content', 'timeline', 'correlation', 'matrix']}
           currentMode={mode}
           adjust={this.handleZoomToFit.bind(this)}
           knowledge={true}
-          enableSuggestions={false}
+          enableSuggestions={true}
           onApplied={this.handleApplySuggestion.bind(this)}
         />
         <CaseRftKnowledgeGraphBar
@@ -1399,6 +1421,7 @@ class CaseRftKnowledgeGraphComponent extends Component {
           timeRangeValues={timeRangeValues}
           handleSearch={this.handleSearch.bind(this)}
           navOpen={navOpen}
+          resetAllFilters={this.resetAllFilters.bind(this)}
         />
         {selectedEntities.length > 0 && (
           <EntitiesDetailsRightsBar

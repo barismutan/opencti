@@ -57,7 +57,7 @@ describe('StixDomainObject resolver standard behavior', () => {
   const stixDomainObjectStixId = 'tool--34c9875d-8206-4f4b-bf17-f58d9cf7ebec';
   it('should stixDomainObject created', async () => {
     const CREATE_QUERY = gql`
-      mutation StixDomainObjectAdd($input: StixDomainObjectAddInput) {
+      mutation StixDomainObjectAdd($input: StixDomainObjectAddInput!) {
         stixDomainObjectAdd(input: $input) {
           id
           standard_id
@@ -97,7 +97,7 @@ describe('StixDomainObject resolver standard behavior', () => {
   });
   it('should stixDomainObject upserted', async () => {
     const CREATE_QUERY = gql`
-      mutation StixDomainObjectAdd($input: StixDomainObjectAddInput) {
+      mutation StixDomainObjectAdd($input: StixDomainObjectAddInput!) {
         stixDomainObjectAdd(input: $input) {
           id
           standard_id
@@ -164,7 +164,7 @@ describe('StixDomainObject resolver standard behavior', () => {
       }
     `;
     const queryResult = await queryAsAdmin({ query: NUMBER_QUERY });
-    expect(queryResult.data.stixDomainObjectsNumber.total).toEqual(32);
+    expect(queryResult.data.stixDomainObjectsNumber.total).toEqual(33);
   });
   it('should timeseries stixDomainObjects to be accurate', async () => {
     const TIMESERIES_QUERY = gql`

@@ -21,8 +21,7 @@ import {
   INPUT_PARENT,
   INPUT_PARENT_DIRECTORY,
   INPUT_RAW_EMAIL,
-  INPUT_RESOLVES_TO,
-  INPUT_SAMPLE,
+  INPUT_RESOLVES_TO, INPUT_SAMPLE,
   INPUT_SENDER,
   INPUT_SERVICE_DLL,
   INPUT_SRC,
@@ -219,6 +218,7 @@ interface BasicStoreEntity extends BasicStoreCommon {
   color: string;
   attribute_abstract: string;
   content: string;
+  content_mapping: string;
   pattern: string;
   pattern_type: string;
   pattern_version: string;
@@ -324,8 +324,8 @@ interface BasicStoreEntity extends BasicStoreCommon {
 
 interface StoreEntity extends BasicStoreEntity, StoreCommon {
   [INPUT_CREATED_BY]: BasicStoreEntity;
-  [INPUT_OPERATING_SYSTEM]: Array<StoreCyberObservable>;
   [INPUT_SAMPLE]: Array<StoreCyberObservable>;
+  [INPUT_OPERATING_SYSTEM]: Array<StoreCyberObservable>;
   [INPUT_RAW_EMAIL]: Array<BasicStoreEntity>;
   [INPUT_OBJECTS]: Array<BasicStoreEntity>;
   [INPUT_LABELS]: Array<StoreLabel>;
@@ -559,6 +559,9 @@ export interface BasicStoreSettings extends BasicStoreEntity {
   platform_email: string;
   platform_organization: string;
   platform_theme_dark_background: string;
+  enterprise_edition?: Date;
+  activity_listeners_ids?: string[];
+  activity_listeners_users?: string[];
 }
 
 type BasicStoreObject = BasicStoreEntity | BasicStoreCyberObservable | BasicStoreRelation;

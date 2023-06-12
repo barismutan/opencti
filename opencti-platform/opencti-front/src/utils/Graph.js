@@ -35,6 +35,7 @@ import Narrative from '../static/images/entities/narrative.svg';
 import Language from '../static/images/entities/language.svg';
 import Event from '../static/images/entities/event.svg';
 import DataComponent from '../static/images/entities/data-component.svg';
+import MalwareAnalysis from '../static/images/entities/malware-analysis.svg';
 import DataSource from '../static/images/entities/data-source.svg';
 import CaseIncident from '../static/images/entities/case-incident.svg';
 import Feedback from '../static/images/entities/feedback.svg';
@@ -160,6 +161,7 @@ export const graphLevel = {
   Region: 1,
   Position: 1,
   Malware: 1,
+  'Malware-Analysis': 1,
   'Threat-Actor': 1,
   Tool: 1,
   Vulnerability: 1,
@@ -233,6 +235,7 @@ export const graphRawImages = {
   Region,
   Position,
   Malware,
+  'Malware-Analysis': MalwareAnalysis,
   'Threat-Actor': ThreatActor,
   Tool,
   Vulnerability,
@@ -288,6 +291,18 @@ export const decodeGraphData = (encodedGraphData) => {
     const decodedGraphData = JSON.parse(fromB64(encodedGraphData));
     if (typeof decodedGraphData === 'object') {
       return decodedGraphData;
+    }
+  }
+  return {};
+};
+
+export const encodeMappingData = (mappingData) => toB64(JSON.stringify(mappingData));
+
+export const decodeMappingData = (encodedMappingData) => {
+  if (encodedMappingData) {
+    const decodedMappingData = JSON.parse(fromB64(encodedMappingData));
+    if (typeof decodedMappingData === 'object') {
+      return decodedMappingData;
     }
   }
   return {};
@@ -384,6 +399,7 @@ export const defaultValue = (n, tooltip = false) => {
       || n.definition
       || n.source_name
       || n.phase_name
+      || n.result_name
       || (n.content && truncate(n.content, 30))
       || (n.hashes
         && (n.hashes.MD5 || n.hashes['SHA-1'] || n.hashes['SHA-256']))
@@ -393,7 +409,6 @@ export const defaultValue = (n, tooltip = false) => {
           n.target_ref_name,
           20,
         )}`)
-      || n.id
       || defaultValue(R.head(R.pathOr([], ['objects', 'edges'], n))?.node)
       || (n.from
         && n.to
@@ -415,6 +430,7 @@ export const defaultValue = (n, tooltip = false) => {
     || n.definition
     || n.source_name
     || n.phase_name
+    || n.result_name
     || (n.content && truncate(n.content, 30))
     || (n.hashes && (n.hashes.MD5 || n.hashes['SHA-1'] || n.hashes['SHA-256']))
     || (n.source_ref_name

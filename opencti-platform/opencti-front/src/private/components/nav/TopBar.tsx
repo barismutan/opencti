@@ -78,6 +78,7 @@ import TopMenuCaseIncident from './TopMenuCaseIncident';
 import TopMenuCaseFeedback from './TopMenuCaseFeedback';
 import FeedbackCreation from '../cases/feedbacks/FeedbackCreation';
 import TopMenuCases from './TopMenuCases';
+import TopMenuMalwareAnalysis from './TopMenuMalwareAnalysis';
 import { Theme } from '../../../components/Theme';
 import {
   EXPLORE,
@@ -93,6 +94,7 @@ import {
 } from './__generated__/TopBarNotificationNumberSubscription.graphql';
 import TopMenuCaseRfi from './TopMenuCaseRfi';
 import TopMenuCaseRft from './TopMenuCaseRft';
+import TopMenuAudits from './TopMenuAudits';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   appBar: {
@@ -316,6 +318,9 @@ const TopBar: FunctionComponent<TopBarProps> = ({
           {location.pathname.includes('/dashboard/analysis/groupings/') && (
             <TopMenuGrouping />
           )}
+          {location.pathname.includes('/dashboard/analysis/malware_analyses/') && (
+            <TopMenuMalwareAnalysis />
+          )}
           {location.pathname.includes('/dashboard/analysis/notes/') && (
             <TopMenuNote />
           )}
@@ -441,6 +446,9 @@ const TopBar: FunctionComponent<TopBarProps> = ({
             '/dashboard/techniques/data_sources/',
           ) && <TopMenuDataSource />}
           {location.pathname.includes('/dashboard/data') ? <TopMenuData /> : ''}
+          {location.pathname.includes('/dashboard/activity') && (
+              <TopMenuAudits />
+          )}
           {location.pathname.includes('/dashboard/settings') && (
             <TopMenuSettings />
           )}

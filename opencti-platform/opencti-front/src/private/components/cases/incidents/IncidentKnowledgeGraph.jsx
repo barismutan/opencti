@@ -45,7 +45,7 @@ import CaseIncidentPopover from './CaseIncidentPopover';
 import EntitiesDetailsRightsBar from '../../../../utils/graph/EntitiesDetailsRightBar';
 import { hexToRGB } from '../../../../utils/Colors';
 
-const ignoredStixCoreObjectsTypes = ['Incident', 'Note', 'Opinion'];
+const ignoredStixCoreObjectsTypes = ['Case-Incident', 'Note', 'Opinion'];
 
 const PARAMETERS$ = new Subject().pipe(debounce(() => timer(2000)));
 const POSITIONS$ = new Subject().pipe(debounce(() => timer(2000)));
@@ -466,7 +466,7 @@ class IncidentKnowledgeGraphComponent extends Component {
     const params = buildViewParamsFromUrlAndStorage(
       props.history,
       props.location,
-      `view-incident-case-${this.props.caseData.id}-knowledge`,
+      `view-case-incident-${this.props.caseData.id}-knowledge`,
     );
     this.zoom = R.propOr(null, 'zoom', params);
     this.graphObjects = props.caseData.objects.edges.map((n) => ({
@@ -795,7 +795,7 @@ class IncidentKnowledgeGraphComponent extends Component {
           keyword: '',
         },
         () => {
-          this.saveParameters(false);
+          this.saveParameters(true);
           resolve(true);
         },
       );
@@ -1275,8 +1275,28 @@ class IncidentKnowledgeGraphComponent extends Component {
     );
   }
 
-  handleApplySuggestion() {
-    this.forceUpdate();
+  async handleApplySuggestion(createdRelationships) {
+    this.graphObjects = [...this.graphObjects, ...createdRelationships];
+    this.graphData = buildGraphData(
+      this.graphObjects,
+      decodeGraphData(this.props.caseData.x_opencti_graph_data),
+      this.props.t,
+    );
+    await this.resetAllFilters();
+    const selectedTimeRangeInterval = computeTimeRangeInterval(
+      this.graphObjects,
+    );
+    this.setState({
+      selectedTimeRangeInterval,
+      graphData: applyFilters(
+        this.graphData,
+        this.state.stixCoreObjectsTypes,
+        this.state.markedBy,
+        this.state.createdBy,
+        ignoredStixCoreObjectsTypes,
+        selectedTimeRangeInterval,
+      ),
+    });
   }
 
   handleTimeRangeChange(selectedTimeRangeInterval) {
@@ -1346,11 +1366,11 @@ class IncidentKnowledgeGraphComponent extends Component {
           container={caseData}
           PopoverComponent={<CaseIncidentPopover id={caseData.id} />}
           link={`/dashboard/cases/incidents/${caseData.id}/knowledge`}
-          modes={['graph', 'timeline', 'correlation', 'matrix']}
+          modes={['graph', 'content', 'timeline', 'correlation', 'matrix']}
           currentMode={mode}
           adjust={this.handleZoomToFit.bind(this)}
           knowledge={true}
-          enableSuggestions={false}
+          enableSuggestions={true}
           onApplied={this.handleApplySuggestion.bind(this)}
         />
         <IncidentKnowledgeGraphBar
@@ -1402,6 +1422,7 @@ class IncidentKnowledgeGraphComponent extends Component {
           timeRangeValues={timeRangeValues}
           handleSearch={this.handleSearch.bind(this)}
           navOpen={navOpen}
+          resetAllFilters={this.resetAllFilters.bind(this)}
         />
         {selectedEntities.length > 0 && (
           <EntitiesDetailsRightsBar

@@ -27,13 +27,20 @@ const i18n = {
       'Two factor authentication': 'Autenticación de dos factores',
       'Password security policies': 'Políticas de seguridad de contraseñas',
       '0 equals no maximum': '0 es igual a ningún máximo',
-      'Number of chars must be lower or equals to': 'Número de caracteres debe ser menor o igual a',
-      'Number of chars must be greater or equals to': 'Número de caracteres debe ser mayor o igual a',
-      'Number of symbols must be greater or equals to': 'El número de símbolos debe ser mayor o igual a',
-      'Number of digits must be greater or equals to': 'Número de dígitos debe ser mayor o igual a',
-      'Number of words (split on hyphen, space) must be greater or equals to': 'Número de palabras (división en guión, espacio) debe ser mayor o igual a',
-      'Number of lowercase chars must be greater or equals to': 'Número de caracteres en minúscula debe ser mayor o igual a',
-      'Number of uppercase chars must be greater or equals to': 'Número de caracteres en mayúsculas debe ser mayor o igual a',
+      'Number of chars must be lower or equals to':
+        'Número de caracteres debe ser menor o igual a',
+      'Number of chars must be greater or equals to':
+        'Número de caracteres debe ser mayor o igual a',
+      'Number of symbols must be greater or equals to':
+        'El número de símbolos debe ser mayor o igual a',
+      'Number of digits must be greater or equals to':
+        'Número de dígitos debe ser mayor o igual a',
+      'Number of words (split on hyphen, space) must be greater or equals to':
+        'Número de palabras (división en guión, espacio) debe ser mayor o igual a',
+      'Number of lowercase chars must be greater or equals to':
+        'Número de caracteres en minúscula debe ser mayor o igual a',
+      'Number of uppercase chars must be greater or equals to':
+        'Número de caracteres en mayúsculas debe ser mayor o igual a',
       gt: 'Superior a',
       lte: 'Inferior o igual a',
       Login: 'Usuario',
@@ -85,7 +92,8 @@ const i18n = {
       'Do you want to delete this kill chain phase?':
         '¿Quieres borrar esta fase de la «kill chain»?',
       'Do you want to delete this report?': '¿Quieres borrar este informe?',
-      'Do you want to delete this relationship?': '¿Quieres borrar esta relación?',
+      'Do you want to delete this relationship?':
+        '¿Quieres borrar esta relación?',
       'Cascade delete': 'Eliminación en cascada',
       'In this report, ': 'En este informe, ',
       'element(s) are not linked to any other reports and will be orphan after the deletion.':
@@ -241,7 +249,7 @@ const i18n = {
       'Hidden entity types': 'Tipos de entidad ocultos',
       'Hidden in roles': 'Oculto en roles',
       'Hidden in interface': 'Oculto en la interfaz',
-      'This configuration hide a specific entity type across the entire platform.':
+      'This configuration hides a specific entity type across the entire platform.':
         'Esta configuración oculta un tipo de entidad específico en toda la plataforma.',
       'Enforce references': 'Hacer cumplir las referencias',
       'Create external reference at upload':
@@ -374,7 +382,9 @@ const i18n = {
       'Create an incident': 'Crear un incidente',
       'Update an incident': 'Actualizar un incidente',
       'Create a malware': 'Crear código malicioso',
+      'Create a malware analysis': 'Crear un análisis de código malicioso',
       'Update a malware': 'Actualizar código malicioso',
+      'Update a malware analysis': 'Actualizar un análisis de código malicioso',
       'Create a channel': 'Crear un canal',
       'Update a channel': 'Actualizar un canal',
       'Create a narrative': 'Crear una narrativa',
@@ -390,14 +400,20 @@ const i18n = {
       'Create a feedback': 'Crear un comentario',
       'Update a feedback': 'Actualizar un comentario',
       'Submit a feedback': 'Enviar un comentario',
-      'Do you want to delete this case incident ?': '¿Desea eliminar este incidente de caso?',
-      'Do you want to delete this feedback ?': '¿Quieres eliminar este comentario?',
-      'Do you want to delete this request for information case ?': '¿Desea eliminar este caso de solicitud de información?',
-      'Do you want to delete this request for takedown case ?': '¿Quieres eliminar esta solicitud de caso de eliminación?',
+      'Do you want to delete this case incident ?':
+        '¿Desea eliminar este incidente de caso?',
+      'Do you want to delete this feedback ?':
+        '¿Quieres eliminar este comentario?',
+      'Do you want to delete this request for information case ?':
+        '¿Desea eliminar este caso de solicitud de información?',
+      'Do you want to delete this request for takedown case ?':
+        '¿Quieres eliminar esta solicitud de caso de eliminación?',
       'Create a request for information': 'Crear una solicitud de información',
-      'Update a request for information': 'Actualizar una solicitud de información',
+      'Update a request for information':
+        'Actualizar una solicitud de información',
       'Create a request for takedown': 'Crear una solicitud de eliminación',
-      'Update a request for takedown': 'Actualizar una solicitud de eliminación',
+      'Update a request for takedown':
+        'Actualizar una solicitud de eliminación',
       'Request for Information date': 'Fecha de solicitud de información',
       'Request for Takedown date': 'Solicitud de fecha de eliminación',
       'Do you want to delete this task ?': '¿Quieres eliminar esta tarea?',
@@ -563,6 +579,7 @@ const i18n = {
       'No enrichment connectors on this platform':
         'Ningún conector de enriquecimiento en esta plataforma',
       'Enrichment connectors': 'Conectores de enriquecimiento ',
+      'Add in container': 'Añadir en contenedor',
       'Copy disabled: too many selected elements (maximum number of elements for a copy: ':
         'Copia deshabilitada: demasiados elementos seleccionados (número máximo de elementos para una copia: ',
       Copy: 'Copiar',
@@ -664,6 +681,8 @@ const i18n = {
       Incident: 'Incidente',
       Malwares: 'Malware',
       Malware: 'Malware',
+      'Malware Analysis': 'Análisis de malware',
+      'Malware Analyses': 'Análisis de malware',
       Channels: 'Canales',
       Channel: 'Canal',
       Narrative: 'Narrativa',
@@ -1526,6 +1545,28 @@ const i18n = {
       entity_Region: 'Región',
       entity_Position: 'Posición',
       entity_Malware: 'Malware',
+      'entity_Malware-Analysis': 'Análisis de malware',
+      Product: 'Producto',
+      'Result name': 'Nombre del resultado',
+      Result_name: 'Nombre del resultado',
+      'Malware result': 'Resultado malware',
+      Version: 'Versión',
+      'Version of the product': 'Version del producto',
+      'Configuration version': 'Versión de configuración',
+      Configuration_version: 'Versión de configuración',
+      'Submission date': 'Fecha de envío',
+      Submitted: 'Fecha de envío',
+      'Analysis started': 'Análisis iniciado',
+      Analysis_started: 'Análisis iniciado',
+      'Analysis ended': 'Análisis finalizado',
+      Analysis_ended: 'Análisis finalizado',
+      'Analysis engine version': 'Versión del motor de análisis',
+      Analysis_engine_version: 'Versión del motor de análisis',
+      'Analysis definition version': 'Versión de la definición del análisis',
+      Analysis_definition_version: 'Versión de la definición del análisis',
+      Modules: 'Módulos',
+      Result: 'Resultados',
+      'Operating System': 'Sistema operativo',
       'entity_Threat-Actor': 'Actor de amenazas',
       entity_Tool: 'Herramienta',
       entity_Channel: 'Canal',
@@ -1626,6 +1667,7 @@ const i18n = {
       'relationship_variant-of': 'variante de',
       relationship_characterizes: 'caracteriza',
       'relationship_analysis-of': 'análisis de',
+      'relationship_analysis-sco': 'análisis sco',
       'relationship_static-analysis-of': 'análisis estático de',
       'relationship_dynamic-analysis-of': 'análisis dinámico de',
       relationship_impersonates: 'suplanta',
@@ -1646,6 +1688,8 @@ const i18n = {
       'relationship_dst-payload': 'payload',
       'relationship_encapsulated-by': 'encapsulated by',
       relationship_encapsulates: 'encapsulates',
+      'relationship_host-vm': 'host VM',
+      'relationship_installed-software': 'installed software',
       'relationship_opened-connection': 'opened connection',
       'relationship_operating-system': 'operating system',
       relationship_parent: 'parent',
@@ -1732,6 +1776,9 @@ const i18n = {
       filter_createdBy_not_eq: 'NO Autor',
       filter_category: 'Categoría',
       filter_entity_types: 'Tipo de entidads',
+      filter_members_user: 'Usuario',
+      filter_members_group: 'Grupo',
+      filter_members_organization: 'Organización',
       filter_creator: 'Creador técnico',
       filter_creator_not_eq: 'NO Creador técnico',
       filter_markedBy: 'Clasificación',
@@ -1839,6 +1886,7 @@ const i18n = {
       GRAPHQL_API: 'API de GraphQL',
       EXPIRATION_SCHEDULER: 'Planificador de expiración',
       TASK_MANAGER: 'Gestor de tareas',
+      ACTIVITY_MANAGER: 'Gestor de actividad',
       RULE_ENGINE: 'Motor de reglas',
       SYNC_MANAGER: 'Gestor de sincronización',
       SUBSCRIPTION_MANAGER: 'Gestor de suscripciones',
@@ -1863,6 +1911,12 @@ const i18n = {
       'suggestion_threats-indicators':
         'La acción de crear `indica` reñacopmes emtre los indicadores y la amenaza seleccionada, después añade todas las relaciones al contenedor.',
       Collapse: 'Colapso',
+      'Platform Message Configuration': 'Configuración de mensajes de la plataforma',
+      'Platform Consent Message': 'Mensaje de consentimiento de la plataforma',
+      'Platform Consent Confirm Text': 'Texto de confirmación de consentimiento de la plataforma',
+      'Requires acceptance to enable login form when set':
+        'Requiere aceptación para habilitar el formulario de inicio de sesión cuando se establece',
+      'One line confirm label next to confirm checkbox': 'Etiqueta de confirmación de una línea junto a la casilla de verificación de confirmación',
     },
     'fr-fr': {
       // Titles
@@ -1892,13 +1946,20 @@ const i18n = {
       'Two factor authentication': 'Authentification à deux facteurs',
       'Password security policies': 'Politiques de sécurité des mots de passe',
       '0 equals no maximum': '0 pour aucun maximum',
-      'Number of chars must be lower or equals to': 'Le nombre de caractères doit être inférieur ou égal à',
-      'Number of chars must be greater or equals to': 'Le nombre de caractères doit être supérieur ou égal à',
-      'Number of symbols must be greater or equals to': 'Le nombre de symboles doit être supérieur ou égal à',
-      'Number of digits must be greater or equals to': 'Le nombre de chiffres doit être supérieur ou égal à',
-      'Number of words (split on hyphen, space) must be greater or equals to': 'Le nombre de mots (séparés par un trait d\'union, un espace) doit être supérieur ou égal à',
-      'Number of lowercase chars must be greater or equals to': 'Le nombre de caractères minuscules doit être supérieur ou égal à',
-      'Number of uppercase chars must be greater or equals to': 'Le nombre de caractères majuscules doit être supérieur ou égal à',
+      'Number of chars must be lower or equals to':
+        'Le nombre de caractères doit être inférieur ou égal à',
+      'Number of chars must be greater or equals to':
+        'Le nombre de caractères doit être supérieur ou égal à',
+      'Number of symbols must be greater or equals to':
+        'Le nombre de symboles doit être supérieur ou égal à',
+      'Number of digits must be greater or equals to':
+        'Le nombre de chiffres doit être supérieur ou égal à',
+      'Number of words (split on hyphen, space) must be greater or equals to':
+        "Le nombre de mots (séparés par un trait d'union, un espace) doit être supérieur ou égal à",
+      'Number of lowercase chars must be greater or equals to':
+        'Le nombre de caractères minuscules doit être supérieur ou égal à',
+      'Number of uppercase chars must be greater or equals to':
+        'Le nombre de caractères majuscules doit être supérieur ou égal à',
       gt: 'Supérieur à',
       lte: 'Inférieur ou égal à',
       Login: "Nom d'utilisateur",
@@ -1959,7 +2020,8 @@ const i18n = {
         'Souhaitez-vous supprimer cette étape de kill chain ?',
       'Do you want to delete this report?':
         'Souhaitez-vous supprimer ce rapport ?',
-      'Do you want to delete this relationship?': 'Voulez-vous supprimer cette relation ?',
+      'Do you want to delete this relationship?':
+        'Voulez-vous supprimer cette relation ?',
       'Cascade delete': 'Suppression en cascade',
       'In this report, ': 'Dans ce rapport, ',
       'element(s) are not linked to any other reports and will be orphan after the deletion.':
@@ -2132,7 +2194,7 @@ const i18n = {
       'Hidden entity types': "Types d'entité cachés",
       'Hidden in roles': 'Caché dans les roles',
       'Hidden in interface': "Caché dans l'interface",
-      'This configuration hide a specific entity type across the entire platform.':
+      'This configuration hides a specific entity type across the entire platform.':
         "Cette configuration masque un type d'entité spécifique sur l'ensemble de la plateforme.",
       'Enforce references': 'Appliquer les références',
       'Create external reference at upload':
@@ -2257,7 +2319,9 @@ const i18n = {
       'Create an incident': 'Créer un incident',
       'Update an incident': 'Modifier un incident',
       'Create a malware': 'Créer un code malveillant',
+      'Create a malware analysis': 'Créer une analyse de code malveillant',
       'Update a malware': 'Modifier un code malveillant',
+      'Update a malware analysis': 'Modifier une analyse de code malveillant',
       'Create a channel': 'Créer un canal',
       'Update a channel': 'Modifier un canal',
       'Create a narrative': 'Créer un narratif',
@@ -2273,25 +2337,31 @@ const i18n = {
       'Create a feedback': 'Créer un commentaire',
       'Update a feedback': 'Mettre à jour un commentaire',
       'Submit a feedback': 'Soumettre un commentaire',
-      'Do you want to delete this case incident ?': 'Voulez-vous supprimer ce cas d\'incident ?',
-      'Do you want to delete this feedback ?': 'Voulez-vous supprimer ce commentaire ?',
-      'Do you want to delete this request for information case ?': 'Voulez-vous supprimer ce dossier de demande d\'information ?',
-      'Do you want to delete this request for takedown case ?': 'Voulez-vous supprimer ce dossier de demande de retrait ?',
-      'Create a request for information': 'Créer une demande d\'informations',
-      'Update a request for information': 'Mettre à jour une demande d\'information',
+      'Do you want to delete this case incident ?':
+        "Voulez-vous supprimer ce cas d'incident ?",
+      'Do you want to delete this feedback ?':
+        'Voulez-vous supprimer ce commentaire ?',
+      'Do you want to delete this request for information case ?':
+        "Voulez-vous supprimer ce dossier de demande d'information ?",
+      'Do you want to delete this request for takedown case ?':
+        'Voulez-vous supprimer ce dossier de demande de retrait ?',
+      'Create a request for information': "Créer une demande d'informations",
+      'Update a request for information':
+        "Mettre à jour une demande d'information",
       'Create a request for takedown': 'Créer une demande de retrait',
       'Update a request for takedown': 'Mettre à jour une demande de retrait',
-      'Request for Information date': 'Date de la demande d\'information',
+      'Request for Information date': "Date de la demande d'information",
       'Request for Takedown date': 'Date de la demande de retrait',
-      'Do you want to delete this task ?': 'Voulez-vous supprimer cette tâche ?',
+      'Do you want to delete this task ?':
+        'Voulez-vous supprimer cette tâche ?',
       'Create a task': 'Créer une tâche',
       'Update a task': 'Mettre à jour une tâche',
       'Add a task to this container': 'Ajouter une tâche à ce conteneur',
       Tasks: 'Tâches',
       takedown_types: 'types de retraits',
-      information_types: 'types d\'informations',
+      information_types: "types d'informations",
       Takedown_types: 'Types de retraits',
-      Information_types: 'Types d\'informations',
+      Information_types: "Types d'informations",
       'Export to image': 'Exporter en image',
       'Export to PDF': 'Exporter en PDF',
       'Export to CSV': 'Exporter en CSV',
@@ -2444,6 +2514,7 @@ const i18n = {
       'No enrichment connectors on this platform':
         "Aucun connecteur d'enrichissement sur cette plateforme",
       'Enrichment connectors': "Connecteurs d'enrichissement",
+      'Add in container': 'Ajout dans un conteneur',
       'Copy disabled: too many selected elements (maximum number of elements for a copy: ':
         "Copie désactivée : trop d’éléments sélectionnés (nombre maximum d'éléments pour une copie: ",
       Copy: 'Copie',
@@ -2486,10 +2557,10 @@ const i18n = {
       'Potential duplicate entities': "Duplicats potentiels d'entités",
       'Create an opinion': 'Créer une opinion',
       'Update opinion': "Modifier l'opinion",
-      'Manage access': 'Gérer l\'accès',
+      'Manage access': "Gérer l'accès",
       'Add new access': 'Ajouter un nouvel accès',
       'Access already granted': 'Accès déjà accordé',
-      'Access right': 'Droit d\'accès',
+      'Access right': "Droit d'accès",
       'Current members access': 'Accès des membres actuels',
       'Deleted or restricted member': 'Membre supprimé ou restreint',
       // Menu
@@ -2545,6 +2616,8 @@ const i18n = {
       Incident: 'Incident',
       Malwares: 'Codes malveillants',
       Malware: 'Code malveillant',
+      'Malware Analysis': 'Analyse de code malveillant',
+      'Malware Analyses': 'Analyses de code malveillant',
       Channels: 'Canaux',
       Channel: 'Canal',
       Narrative: 'Narratif',
@@ -2668,7 +2741,7 @@ const i18n = {
       entity_Threats: 'Menaces',
       entity_Case: 'Case',
       entity_Feedback: 'Commentaire',
-      'entity_Case-Rfi': 'Demande d\'information',
+      'entity_Case-Rfi': "Demande d'information",
       'entity_Case-Rft': 'Demande de retrait',
       'entity_Case-Incident': 'Réponse aux incidents',
       'entity_Case-Task': 'Tâches',
@@ -3047,7 +3120,7 @@ const i18n = {
       'Case priority': 'Priorité',
       'Case severity': 'Sévérité',
       'Case Task': 'Tâche de cas',
-      'Due Date': 'Date d\'échéance',
+      'Due Date': "Date d'échéance",
       'Apply case templates': 'Appliquer des modèles de cas',
       'Create a case template': 'Créer un nouveau modèle de cas',
       'Apply a new case template': 'Appliquer un nouveau modèle de cas',
@@ -3055,8 +3128,9 @@ const i18n = {
       'Update the case template': 'Modifier le modèle de cas',
       Apply: 'Appliquer',
       Unlink: 'Dissocier',
-      'Do you want to unlink this task ?': 'Voulez-vous dissocier cette tâche ?',
-      'No tasks has been found.': 'Aucune tâche n\'a été trouvée.',
+      'Do you want to unlink this task ?':
+        'Voulez-vous dissocier cette tâche ?',
+      'No tasks has been found.': "Aucune tâche n'a été trouvée.",
       'Source name': 'Nom de la source',
       'External ID': 'ID externe',
       'Log sources': 'Sources de log',
@@ -3089,11 +3163,11 @@ const i18n = {
       'Add Tick': 'Ajouter un marqueur',
       'Incident response type': 'Type de réponse à incident',
       'Related cases': 'Cas connexes',
-      'Request for information type': 'Type de demande d\'informations',
+      'Request for information type': "Type de demande d'informations",
       'Request for takedown type': 'Type de demande de retrait',
-      'Request For Information Date': 'Date de la demande d\'informations',
+      'Request For Information Date': "Date de la demande d'informations",
       'Request For Takedown Date': 'Date de la demande de Retrait',
-      'Information type': 'Type d\'informations',
+      'Information type': "Type d'informations",
       'Takedown type': 'Type de retrait',
       Ticks: 'Marqueurs',
       Likelihood: 'Probabilité',
@@ -3171,6 +3245,7 @@ const i18n = {
       'Total processed messages': 'Total de messages traités',
       'Read operations': 'Opérations de lecture',
       'Write operations': "Opérations d'écriture",
+      'Platform login message': 'Message de connexion à la plateforme',
       Write: 'Ecrire',
       Preview: 'Aperçu',
       'Graph type': 'Type de graphique',
@@ -3351,7 +3426,8 @@ const i18n = {
       Limit: 'Limite',
       'All threats': 'Toutes les menaces',
       Assignees: 'Référents',
-      'Users, groups or organizations': 'Utilisateurs, groupes ou organisations',
+      'Users, groups or organizations':
+        'Utilisateurs, groupes ou organisations',
       'Everyone on the platform': 'Tout le monde sur la plateforme',
       on: 'le',
       Use: 'Utiliser',
@@ -3416,6 +3492,28 @@ const i18n = {
       entity_Region: 'Région',
       entity_Position: 'Position',
       entity_Malware: 'Code malveillant',
+      'entity_Malware-Analysis': 'Analyse de code malveillant',
+      Product: 'Produit',
+      'Result name': 'Nom du résultat',
+      Result_name: 'Nom du résultat',
+      'Malware result': 'Résultat du code malveillant',
+      Version: 'Version',
+      'Version of the product': 'Version du produit',
+      'Configuration version': 'Version de la configuration',
+      Configuration_version: 'Version de la configuration',
+      'Submission date': 'Date de soumission',
+      Submitted: 'Date de soumission',
+      'Analysis started': 'Analyse commencée',
+      Analysis_started: 'Analyse commencée',
+      'Analysis ended': 'Analyse terminée',
+      Analysis_ended: 'Analyse terminée',
+      'Analysis engine version': "Version du moteur d'analyse",
+      Analysis_engine_version: "Version du moteur d'analyse",
+      'Analysis definition version': "Version de la définition de l'analyse",
+      Analysis_definition_version: "Version de la définition de l'analyse",
+      Modules: 'Modules',
+      Result: 'Résultat',
+      'Operating System': "Système d'exploitation",
       'entity_Threat-Actor': 'Acteur',
       entity_Tool: 'Outil',
       entity_Channel: 'Canal',
@@ -3515,6 +3613,7 @@ const i18n = {
       'relationship_variant-of': 'variante de',
       relationship_characterizes: 'caractérise',
       'relationship_analysis-of': 'analyse de',
+      'relationship_analysis-sco': 'analyse sco',
       'relationship_static-analysis-of': 'analyse statique de',
       'relationship_dynamic-analysis-of': 'analyse dynamique de',
       relationship_impersonates: 'se fait passer pour',
@@ -3535,6 +3634,8 @@ const i18n = {
       'relationship_dst-payload': 'payload',
       'relationship_encapsulated-by': 'encapsulated by',
       relationship_encapsulates: 'encapsulates',
+      'relationship_host-vm': 'host VM',
+      'relationship_installed-software': 'installed software',
       'relationship_opened-connection': 'opened connection',
       'relationship_operating-system': 'operating system',
       relationship_parent: 'parent',
@@ -3606,6 +3707,9 @@ const i18n = {
       filter_createdBy_not_eq: 'SANS Auteur',
       filter_category: 'Catégorie',
       filter_entity_types: "Type d'entités",
+      filter_members_user: 'Utilisateur',
+      filter_members_group: 'Groupe',
+      filter_members_organization: 'Organisation',
       filter_creator: 'Créateur technique',
       filter_creator_not_eq: 'SANS Créateur technique',
       filter_markedBy: 'Marquage',
@@ -3712,6 +3816,7 @@ const i18n = {
       GRAPHQL_API: 'API GraphQL',
       EXPIRATION_SCHEDULER: "Planificateur d'expiration",
       TASK_MANAGER: 'Manager des tâches',
+      ACTIVITY_MANAGER: 'Manager d\'activité',
       RULE_ENGINE: 'Moteur de règles',
       SYNC_MANAGER: 'Manager de synchronisation',
       SUBSCRIPTION_MANAGER: 'Manager des souscriptions',
@@ -3735,7 +3840,17 @@ const i18n = {
         'Références automatiques lors du téléchargement du fichier',
       'suggestion_threats-indicators':
         'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
+      'suggestion_threats-arsenal':
+        'Create `uses` relationships between the selected threat and arsenal objects (TTPs, tools, channels, etc.), then add all relations to the container.',
+      'suggestion_threats-targets':
+        'Create `targets` relationships between the selected threat and victim objects (countries, sectors, etc.), then add all relations to the container.',
       Collapse: 'Réduire',
+      'Platform Message Configuration': 'Configuration des messages de la plate-forme',
+      'Platform Consent Message': 'Message de consentement de la plateforme',
+      'Platform Consent Confirm Text': 'Texte de confirmation du consentement de la plateforme',
+      'Requires acceptance to enable login form when set':
+        "Nécessite une acceptation pour activer le formulaire de connexion lorsqu'il est défini",
+      'One line confirm label next to confirm checkbox': 'Texte monoligne de confirmation à côté de la case à cocher de confirmation',
     },
     'ja-jp': {
       // Titles
@@ -3764,13 +3879,20 @@ const i18n = {
       'Two factor authentication': '二要素認証',
       'Password security policies': 'パスワード セキュリティ ポリシー',
       '0 equals no maximum': '0 は最大値なし',
-      'Number of chars must be lower or equals to': '文字数は以下でなければなりません',
-      'Number of chars must be greater or equals to': '文字数は次の値以上でなければなりません',
-      'Number of symbols must be greater or equals to': 'シンボルの数は次の値以上でなければなりません',
-      'Number of digits must be greater or equals to': '桁数は以上でなければなりません',
-      'Number of words (split on hyphen, space) must be greater or equals to': '単語数 (ハイフン、スペースで分割) は次の値以上でなければなりません',
-      'Number of lowercase chars must be greater or equals to': '小文字の数は次の値以上でなければなりません',
-      'Number of uppercase chars must be greater or equals to': '大文字の数は次の値以上でなければなりません',
+      'Number of chars must be lower or equals to':
+        '文字数は以下でなければなりません',
+      'Number of chars must be greater or equals to':
+        '文字数は次の値以上でなければなりません',
+      'Number of symbols must be greater or equals to':
+        'シンボルの数は次の値以上でなければなりません',
+      'Number of digits must be greater or equals to':
+        '桁数は以上でなければなりません',
+      'Number of words (split on hyphen, space) must be greater or equals to':
+        '単語数 (ハイフン、スペースで分割) は次の値以上でなければなりません',
+      'Number of lowercase chars must be greater or equals to':
+        '小文字の数は次の値以上でなければなりません',
+      'Number of uppercase chars must be greater or equals to':
+        '大文字の数は次の値以上でなければなりません',
       gt: 'より大きい',
       lte: '以下',
       Login: 'ログイン',
@@ -3962,7 +4084,7 @@ const i18n = {
       'Hidden entity types': '非表示のエンティティ種別',
       'Hidden in roles': 'ロールに隠されている',
       'Hidden in interface': 'インターフェイスに隠されている',
-      'This configuration hide a specific entity type across the entire platform.':
+      'This configuration hides a specific entity type across the entire platform.':
         'この構成により、プラットフォーム全体で特定のエンティティ タイプが非表示になりました。',
       'Enforce references': '参照を強制する',
       'Create external reference at upload': 'アップロード時に外部参照を作成',
@@ -4109,10 +4231,14 @@ const i18n = {
       'Create a feedback': 'フィードバックを作成する',
       'Update a feedback': 'フィードバックを更新する',
       'Submit a feedback': 'フィードバックを送信する',
-      'Do you want to delete this case incident ?': 'このケース インシデントを削除しますか?',
-      'Do you want to delete this feedback ?': 'このフィードバックを削除しますか?',
-      'Do you want to delete this request for information case ?': 'この情報要求のケースを削除しますか?',
-      'Do you want to delete this request for takedown case ?': 'この削除依頼のケースを削除しますか?',
+      'Do you want to delete this case incident ?':
+        'このケース インシデントを削除しますか?',
+      'Do you want to delete this feedback ?':
+        'このフィードバックを削除しますか?',
+      'Do you want to delete this request for information case ?':
+        'この情報要求のケースを削除しますか?',
+      'Do you want to delete this request for takedown case ?':
+        'この削除依頼のケースを削除しますか?',
       'Create a request for information': '情報のリクエストを作成する',
       'Update a request for information': '情報のリクエストを更新する',
       'Create a request for takedown': '削除依頼を作成する',
@@ -4279,6 +4405,7 @@ const i18n = {
       'No enrichment connectors on this platform':
         '有効なエンリッチ用コネクタがありません',
       'Enrichment connectors': 'エンリッチ用コネクタ',
+      'Add in container': 'コンテナに追加',
       'Copy disabled: too many selected elements (maximum number of elements for a copy: ':
         'コピー無効:選択した要素が多すぎます(コピーの要素の最大数:',
       Copy: '写し',
@@ -5432,6 +5559,9 @@ const i18n = {
       filter_createdBy_not_eq: '作成者なし',
       filter_category: 'カテゴリー',
       filter_entity_types: 'エンティティ タイプ',
+      filter_members_user: '使い手',
+      filter_members_group: '族',
+      filter_members_organization: '組織',
       filter_creator: 'テクニカルクリエーター',
       filter_creator_not_eq: 'テクニカルクリエーターなし',
       filter_markedBy: 'データマーキング',
@@ -5538,6 +5668,7 @@ const i18n = {
       GRAPHQL_API: 'GraphQL API',
       EXPIRATION_SCHEDULER: '有効期限スケジューラ',
       TASK_MANAGER: 'タスクマネージャ',
+      ACTIVITY_MANAGER: '活動マネージャー',
       RULE_ENGINE: 'ルールエンジン',
       SYNC_MANAGER: 'シンクマネージャ',
       SUBSCRIPTION_MANAGER: 'サブスクリプションマネージャ',
@@ -5561,10 +5692,16 @@ const i18n = {
       'suggestion_threats-indicators':
         'インジケータと脅威に `指し示す` のリレーションシップを作成したあと、全てのリレーションシップをコンテナに追加する。',
       Collapse: '崩壊',
+      'Platform Message Configuration': 'プラットフォームメッセージの構成',
+      'Platform Consent Message': 'プラットフォーム同意メッセージ',
+      'Platform Consent Confirm Text': 'プラットフォーム同意確認テキスト',
+      'Requires acceptance to enable login form when set': '設定時にログインフォームを有効にするには同意が必要です',
+      'One line confirm label next to confirm checkbox': '確認チェックボックスの横にある 1 行の確認ラベル',
     },
     'zh-cn': {
       // Titles
-      'OpenCTI - Cyber threat intelligence platform': 'OpenCTI - 网络威胁情报平台',
+      'OpenCTI - Cyber threat intelligence platform':
+        'OpenCTI - 网络威胁情报平台',
       // Errors
       Error: '错误',
       'Bad login or password': '用户名或密码错误',
@@ -5591,9 +5728,12 @@ const i18n = {
       'Number of chars must be greater or equals to': '字符數必須大於或等於',
       'Number of symbols must be greater or equals to': '符號數必須大於或等於',
       'Number of digits must be greater or equals to': '位數必須大於或等於',
-      'Number of words (split on hyphen, space) must be greater or equals to': '字數（以連字符、空格分隔）必須大於或等於',
-      'Number of lowercase chars must be greater or equals to': '小寫字符的數量必須大於或等於',
-      'Number of uppercase chars must be greater or equals to': '大寫字符的數量必須大於或等於',
+      'Number of words (split on hyphen, space) must be greater or equals to':
+        '字數（以連字符、空格分隔）必須大於或等於',
+      'Number of lowercase chars must be greater or equals to':
+        '小寫字符的數量必須大於或等於',
+      'Number of uppercase chars must be greater or equals to':
+        '大寫字符的數量必須大於或等於',
       gt: '優於',
       lte: '小於或等於',
       Login: '登录',
@@ -5759,7 +5899,7 @@ const i18n = {
       'Hidden entity types': '隐藏的实体类型',
       'Hidden in roles': '隱藏在角色中',
       'Hidden in interface': '隐藏在界面中',
-      'This configuration hide a specific entity type across the entire platform.':
+      'This configuration hides a specific entity type across the entire platform.':
         '此配置隐藏了整个平台的特定实体类型。',
       'Enforce references': '执行引用',
       'Create external reference at upload': '上传时创建外部参考',
@@ -5893,8 +6033,10 @@ const i18n = {
       'Submit a feedback': '提交反馈',
       'Do you want to delete this case incident ?': '是否要删除此案例事件？',
       'Do you want to delete this feedback ?': '要删除此反馈吗？',
-      'Do you want to delete this request for information case ?': '是否要删除此信息案例请求？',
-      'Do you want to delete this request for takedown case ?': '您要删除此移除案例请求吗？',
+      'Do you want to delete this request for information case ?':
+        '是否要删除此信息案例请求？',
+      'Do you want to delete this request for takedown case ?':
+        '您要删除此移除案例请求吗？',
       'Create a request for information': '创建信息请求',
       'Update a request for information': '更新信息请求',
       'Create a request for takedown': '创建移除请求',
@@ -6051,6 +6193,7 @@ const i18n = {
       'Enabled import connectors': '已启用的导入连接器',
       'No enrichment connectors on this platform': '此平台上没有富化连接器',
       'Enrichment connectors': '富化连接器',
+      'Add in container': '添加到容器中',
       'Copy disabled: too many selected elements (maximum number of elements for a copy: ':
         '複製已關閉：選取元素過多（複製的最大元素數：',
       Copy: '複製',
@@ -6750,6 +6893,7 @@ const i18n = {
       'Total processed messages': '已处理消息总数',
       'Read operations': '读取操作',
       'Write operations': '写入操作',
+      'Platform login message': '平台登錄信息',
       Write: '写入',
       Preview: '预览',
       'Graph type': '图表类型',
@@ -7078,6 +7222,8 @@ const i18n = {
       'relationship_dst-payload': 'payload',
       'relationship_encapsulated-by': 'encapsulated by',
       relationship_encapsulates: 'encapsulates',
+      'relationship_host-vm': 'host VM',
+      'relationship_installed-software': 'installed software',
       'relationship_opened-connection': 'opened connection',
       'relationship_operating-system': 'operating system',
       relationship_parent: 'parent',
@@ -7150,6 +7296,9 @@ const i18n = {
       filter_createdBy_not_eq: '非作者',
       filter_category: '類別',
       filter_entity_types: '實體類型',
+      filter_members_user: '用戶',
+      filter_members_group: '班組',
+      filter_members_organization: '公家',
       filter_creator: '技術創造者',
       filter_creator_not_eq: '非技術創造者',
       filter_markedBy: '标记',
@@ -7256,6 +7405,7 @@ const i18n = {
       GRAPHQL_API: 'API GraphQL',
       EXPIRATION_SCHEDULER: '过期计划程序',
       TASK_MANAGER: '任务管理器',
+      ACTIVITY_MANAGER: '活動經理',
       RULE_ENGINE: '规则引擎',
       SYNC_MANAGER: '同步管理器',
       SUBSCRIPTION_MANAGER: '订阅管理器',
@@ -7288,6 +7438,11 @@ const i18n = {
       'suggestion_threats-indicators':
         '在指标和所选威胁之间创建“指示”关系，然后将所有关系添加到容器中',
       Collapse: '坍塌',
+      'Platform Message Configuration': '平台消息配置',
+      'Platform Consent Message': '我已阅读并遵守以上声明',
+      'Platform Consent Confirm Text': '平台同意確認文本',
+      'Requires acceptance to enable login form when set': '設置後需要接受才能啟用登錄表單',
+      'One line confirm label next to confirm checkbox': '確認複選框旁邊的一行確認標籤',
     },
     'en-us': {
       gt: 'Greater than',
@@ -7351,6 +7506,7 @@ const i18n = {
       entity_Region: 'Region',
       entity_Position: 'Position',
       entity_Malware: 'Malware',
+      'entity_Malware-Analysis': 'Malware Analysis',
       entity_Event: 'Event',
       'entity_Threat-Actor': 'Threat Actor',
       entity_Tool: 'Tool',
@@ -7451,6 +7607,7 @@ const i18n = {
       'relationship_variant-of': 'variant of',
       relationship_characterizes: 'characterizes',
       'relationship_analysis-of': 'analysis of',
+      'relationship_analysis-sco': 'analysis sco',
       'relationship_static-analysis-of': 'static analysis of',
       'relationship_dynamic-analysis-of': 'dynamic analysis of',
       relationship_impersonates: 'impersonates',
@@ -7471,6 +7628,8 @@ const i18n = {
       'relationship_dst-payload': 'payload',
       'relationship_encapsulated-by': 'encapsulated by',
       relationship_encapsulates: 'encapsulates',
+      'relationship_host-vm': 'host VM',
+      'relationship_installed-software': 'installed software',
       'relationship_opened-connection': 'opened connection',
       'relationship_operating-system': 'operating system',
       relationship_parent: 'parent',
@@ -7515,8 +7674,6 @@ const i18n = {
       'personal-satisfaction': 'Personal satisfaction',
       revenge: 'Revenge/Retaliation',
       unpredictable: 'Unpredictable/Unkown',
-      Unknown: 'Unknown',
-      unknown: 'unknown',
       organization_constituent: 'Constituent',
       organization_csirt: 'CSIRT',
       organization_partner: 'Partner',
@@ -7545,6 +7702,9 @@ const i18n = {
       filter_createdBy_not_eq: 'NOT Author',
       filter_category: 'Category',
       filter_entity_types: 'Entity types',
+      filter_members_user: 'User',
+      filter_members_group: 'Group',
+      filter_members_organization: 'Organization',
       filter_creator: 'Technical creator',
       filter_creator_not_eq: 'NOT Technical creator',
       filter_markedBy: 'Marking definition',
@@ -7598,6 +7758,7 @@ const i18n = {
       filter_revoked: 'Revoked',
       filter_toSightingId: 'Sighted in/at',
       filter_fromId: 'Source entity',
+      filter_operatingSystem: 'Operating System',
       filter_toId: 'Target entity',
       filter_fromTypes: 'Source type',
       filter_toTypes: 'Target type',
@@ -7649,6 +7810,7 @@ const i18n = {
       GRAPHQL_API: 'GraphQL API',
       EXPIRATION_SCHEDULER: 'Expiration scheduler',
       TASK_MANAGER: 'CaseTemplateTasks manager',
+      ACTIVITY_MANAGER: 'Activity manager',
       RULE_ENGINE: 'Rules engine',
       SYNC_MANAGER: 'Synchronization manager',
       SUBSCRIPTION_MANAGER: 'Subscriptions manager',
@@ -7657,7 +7819,11 @@ const i18n = {
       NOTIFICATION_MANAGER: 'Notification generation manager',
       HISTORY_MANAGER: 'History manager',
       'suggestion_threats-indicators':
-        'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
+          'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
+      'suggestion_threats-arsenal':
+          'Create `uses` relationships between the selected threat and arsenal objects (TTPs, tools, channels, etc.), then add all relations to the container.',
+      'suggestion_threats-targets':
+          'Create `targets` relationships between the selected threat and victim objects (countries, sectors, etc.), then add all relations to the container.',
     },
   },
 };

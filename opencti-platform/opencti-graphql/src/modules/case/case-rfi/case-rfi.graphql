@@ -92,6 +92,7 @@ type CaseRfi implements BasicObject & StixObject & StixCoreObject & StixDomainOb
   x_opencti_graph_data: String
   objectAssignee: AssigneeConnection
   # Container
+  representative: String!
   objects(
     first: Int
     after: ID
@@ -128,6 +129,8 @@ type CaseRfi implements BasicObject & StixObject & StixCoreObject & StixDomainOb
   # Cases
   name: String!
   description: String
+  content: String
+  content_mapping: String
   tasks: CaseTaskConnection!
   # Request For Information
   information_types: [String!]
@@ -140,7 +143,6 @@ enum CaseRfisOrdering {
   name
   created
   modified
-  context
   created_at
   updated_at
   creator
@@ -157,7 +159,6 @@ enum CaseRfisFilter {
   name
   created
   modified
-  context
   created_at
   updated_at
   creator
@@ -211,6 +212,8 @@ input CaseRfiAddInput {
   x_opencti_stix_ids: [StixId]
   name: String! @constraint(minLength: 2)
   description: String
+  content: String
+  content_mapping: String
   severity: String
   priority: String
   confidence: Int

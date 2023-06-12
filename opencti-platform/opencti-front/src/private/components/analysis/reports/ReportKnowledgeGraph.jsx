@@ -777,7 +777,7 @@ class ReportKnowledgeGraphComponent extends Component {
           keyword: '',
         },
         () => {
-          this.saveParameters(false);
+          this.saveParameters(true);
           resolve(true);
         },
       );
@@ -1256,8 +1256,28 @@ class ReportKnowledgeGraphComponent extends Component {
     );
   }
 
-  handleApplySuggestion() {
-    this.forceUpdate();
+  async handleApplySuggestion(createdRelationships) {
+    this.graphObjects = [...this.graphObjects, ...createdRelationships];
+    this.graphData = buildGraphData(
+      this.graphObjects,
+      decodeGraphData(this.props.report.x_opencti_graph_data),
+      this.props.t,
+    );
+    await this.resetAllFilters();
+    const selectedTimeRangeInterval = computeTimeRangeInterval(
+      this.graphObjects,
+    );
+    this.setState({
+      selectedTimeRangeInterval,
+      graphData: applyFilters(
+        this.graphData,
+        this.state.stixCoreObjectsTypes,
+        this.state.markedBy,
+        this.state.createdBy,
+        ignoredStixCoreObjectsTypes,
+        selectedTimeRangeInterval,
+      ),
+    });
   }
 
   handleTimeRangeChange(selectedTimeRangeInterval) {
@@ -1327,7 +1347,7 @@ class ReportKnowledgeGraphComponent extends Component {
           container={report}
           PopoverComponent={<ReportPopover />}
           link={`/dashboard/analysis/reports/${report.id}/knowledge`}
-          modes={['graph', 'timeline', 'correlation', 'matrix']}
+          modes={['graph', 'content', 'timeline', 'correlation', 'matrix']}
           currentMode={mode}
           adjust={this.handleZoomToFit.bind(this)}
           knowledge={true}
@@ -1383,6 +1403,7 @@ class ReportKnowledgeGraphComponent extends Component {
           timeRangeValues={timeRangeValues}
           handleSearch={this.handleSearch.bind(this)}
           navOpen={navOpen}
+          resetAllFilters={this.resetAllFilters.bind(this)}
         />
         {selectedEntities.length > 0 && (
           <EntitiesDetailsRightsBar

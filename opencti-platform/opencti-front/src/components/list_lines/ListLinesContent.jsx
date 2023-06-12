@@ -22,6 +22,7 @@ const styles = () => ({
 class ListLinesContent extends Component {
   constructor(props) {
     super(props);
+    this.containerRef = React.createRef();
     this._isRowLoaded = this._isRowLoaded.bind(this);
     this._loadMoreRows = this._loadMoreRows.bind(this);
     this._rowRenderer = this._rowRenderer.bind(this);
@@ -34,7 +35,8 @@ class ListLinesContent extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const diff = !R.equals(this.props.dataList, prevProps.dataList) || !R.equals(this.props.bookmarkList, prevProps.bookmarkList);
+    const diff = !R.equals(this.props.dataList, prevProps.dataList)
+      || !R.equals(this.props.bookmarkList, prevProps.bookmarkList);
     let selection = false;
     if (
       Object.keys(this.props.selectedElements || {}).length
@@ -139,9 +141,12 @@ class ListLinesContent extends Component {
       deSelectedElements,
       selectAll,
       onToggleEntity,
+      addedElements,
       connectionKey,
       isTo,
       redirectionMode,
+      contentMapping,
+      contentMappingData,
     } = this.props;
     const edge = dataList[index];
     if (!edge) {
@@ -173,6 +178,7 @@ class ListLinesContent extends Component {
             onLabelClick={onLabelClick}
             selectedElements={selectedElements}
             deSelectedElements={deSelectedElements}
+            addedElements={addedElements}
             selectAll={selectAll}
             onToggleEntity={onToggleEntity}
             connectionKey={connectionKey}
@@ -180,6 +186,8 @@ class ListLinesContent extends Component {
             onToggleShiftEntity={this._onRowShiftClick.bind(this)}
             index={index}
             redirectionMode={redirectionMode}
+            contentMapping={contentMapping}
+            contentMappingData={contentMappingData}
           />
         ) : (
           React.cloneElement(LineComponent, {
@@ -194,6 +202,7 @@ class ListLinesContent extends Component {
             onLabelClick,
             selectedElements,
             deSelectedElements,
+            addedElements,
             selectAll,
             onToggleEntity,
             connectionKey,
@@ -201,6 +210,8 @@ class ListLinesContent extends Component {
             onToggleShiftEntity: this._onRowShiftClick.bind(this),
             index,
             redirectionMode,
+            contentMapping,
+            contentMappingData,
           })
         )}
       </div>
@@ -217,6 +228,8 @@ class ListLinesContent extends Component {
       classes,
       selectedElements,
       deSelectedElements,
+      height: propHeight,
+      containerRef: propContainerRef,
     } = this.props;
     const countWithLoading = isLoading()
       ? dataList.length + this.state.loadingRowCount
@@ -239,43 +252,58 @@ class ListLinesContent extends Component {
           if (!R.equals(selectedIds, newSelectedIds)) {
             setSelectedIds(newSelectedIds);
           }
+          let scrollElement = window;
+          if (propHeight && this.containerRef && this.containerRef.current) {
+            scrollElement = this.containerRef.current;
+          } else if (propContainerRef && propContainerRef.current) {
+            scrollElement = propContainerRef.current;
+          }
           return (
-            <WindowScroller ref={this._setRef} scrollElement={window}>
-              {({ height, isScrolling, onChildScroll, scrollTop }) => (
-                <div className={classes.windowScrollerWrapper}>
-                  <InfiniteLoader
-                    isRowLoaded={this._isRowLoaded}
-                    loadMoreRows={this._loadMoreRows}
-                    rowCount={globalCount}
-                  >
-                    {({ onRowsRendered, registerChild }) => (
-                      <AutoSizer disableHeight>
-                        {({ width }) => (
-                          <List
-                            ref={(ref) => {
-                              this.listRef = ref;
-                              registerChild(ref);
-                            }}
-                            autoHeight={true}
-                            height={height}
-                            onRowsRendered={onRowsRendered}
-                            isScrolling={isScrolling}
-                            onScroll={onChildScroll}
-                            overscanRowCount={nbOfRowsToLoad}
-                            rowCount={rowCount}
-                            rowHeight={50}
-                            rowRenderer={this._rowRenderer.bind(this)}
-                            scrollToIndex={-1}
-                            scrollTop={scrollTop}
-                            width={width}
-                          />
-                        )}
-                      </AutoSizer>
-                    )}
-                  </InfiniteLoader>
-                </div>
-              )}
-            </WindowScroller>
+            <div
+              style={{
+                height: propHeight || 'auto',
+                maxHeight: propHeight || 'auto',
+                overflowY: propHeight ? 'auto' : 'hidden',
+              }}
+              ref={this.containerRef}
+            >
+              <WindowScroller ref={this._setRef} scrollElement={scrollElement}>
+                {({ height, isScrolling, onChildScroll, scrollTop }) => (
+                  <div className={classes.windowScrollerWrapper}>
+                    <InfiniteLoader
+                      isRowLoaded={this._isRowLoaded}
+                      loadMoreRows={this._loadMoreRows}
+                      rowCount={globalCount}
+                    >
+                      {({ onRowsRendered, registerChild }) => (
+                        <AutoSizer disableHeight>
+                          {({ width }) => (
+                            <List
+                              ref={(ref) => {
+                                this.listRef = ref;
+                                registerChild(ref);
+                              }}
+                              autoHeight={true}
+                              height={height}
+                              onRowsRendered={onRowsRendered}
+                              isScrolling={isScrolling}
+                              onScroll={onChildScroll}
+                              overscanRowCount={nbOfRowsToLoad}
+                              rowCount={rowCount}
+                              rowHeight={50}
+                              rowRenderer={this._rowRenderer.bind(this)}
+                              scrollToIndex={-1}
+                              scrollTop={scrollTop}
+                              width={width}
+                            />
+                          )}
+                        </AutoSizer>
+                      )}
+                    </InfiniteLoader>
+                  </div>
+                )}
+              </WindowScroller>
+            </div>
           );
         }}
       </ExportContext.Consumer>
@@ -309,6 +337,10 @@ ListLinesContent.propTypes = {
   connectionKey: PropTypes.string,
   isTo: PropTypes.bool,
   redirectionMode: PropTypes.string,
+  addedElements: PropTypes.object,
+  containerRef: PropTypes.object,
+  contentMapping: PropTypes.object,
+  contentMappingData: PropTypes.object,
 };
 
 export default R.compose(inject18n, withStyles(styles))(ListLinesContent);

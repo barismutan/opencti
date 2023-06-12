@@ -50,7 +50,7 @@ import { deleteFile, loadFile, storeFileConverter, upload } from '../database/fi
 import { elCount, elUpdateElement } from '../database/engine';
 import { generateStandardId, getInstanceIds } from '../schema/identifier';
 import { askEntityExport, askListExport, exportTransformFilters } from './stix';
-import { isNotEmptyField, READ_ENTITIES_INDICES, READ_INDEX_INFERRED_ENTITIES } from '../database/utils';
+import { isEmptyField, isNotEmptyField, READ_ENTITIES_INDICES, READ_INDEX_INFERRED_ENTITIES } from '../database/utils';
 import { RELATION_RELATED_TO } from '../schema/stixCoreRelationship';
 import { ENTITY_TYPE_CONTAINER_CASE } from '../modules/case/case-types';
 import { getEntitySettingFromCache } from '../modules/entitySetting/entitySetting-utils';
@@ -68,13 +68,21 @@ export const findAll = async (context, user, args) => {
   if (types.length === 0) {
     types.push(ABSTRACT_STIX_CORE_OBJECT);
   }
+  if (isNotEmptyField(args.relationship_type) && isEmptyField(args.elementId)) {
+    throw UnsupportedError('Cant find stixCoreObject only based on relationship type, elementId is required');
+  }
   let filters = args.filters ?? [];
-  if (isNotEmptyField(args.elementId) && isNotEmptyField(args.relationship_type)) {
-    const relationshipFilterKeys = args.relationship_type.map((n) => buildRefRelationKey(n));
-    filters = [
-      ...filters,
-      { key: relationshipFilterKeys, values: [args.elementId] },
-    ];
+  if (isNotEmptyField(args.elementId)) {
+    // In case of element id, we look for a specific entity used by relationships independent of the direction
+    // To do that we need to lookup the element inside the rel_ fields that represent the relationships connections
+    // that are denormalized at relation creation.
+    // If relation types are also in the query, we filter on specific rel_[TYPE], if not, using a wilcard.
+    if (isNotEmptyField(args.relationship_type)) {
+      const relationshipFilterKeys = args.relationship_type.map((n) => buildRefRelationKey(n));
+      filters = [...filters, { key: relationshipFilterKeys, values: [args.elementId] }];
+    } else {
+      filters = [...filters, { key: buildRefRelationKey('*'), values: [args.elementId] }];
+    }
   }
   return listEntities(context, user, types, { ...R.omit(['elementId', 'relationship_type'], args), filters });
 };
@@ -242,12 +250,13 @@ export const stixCoreObjectExportAsk = async (context, user, args) => {
 };
 
 export const stixCoreObjectsExportPush = async (context, user, type, file, listFilters) => {
-  await upload(context, user, `export/${type}`, file, { list_filters: listFilters });
+  const meta = { list_filters: listFilters };
+  await upload(context, user, `export/${type}`, file, { meta });
   return true;
 };
 export const stixCoreObjectExportPush = async (context, user, entityId, file) => {
   const entity = await internalLoadById(context, user, entityId);
-  await upload(context, user, `export/${entity.entity_type}/${entityId}`, file, { entity_id: entityId });
+  await upload(context, user, `export/${entity.entity_type}/${entityId}`, file, { entity });
   return true;
 };
 
@@ -267,12 +276,12 @@ export const stixCoreObjectImportPush = async (context, user, id, file, noTrigge
     const isAutoExternal = !entitySetting ? false : entitySetting.platform_entity_files_ref;
     const filePath = `import/${previous.entity_type}/${internalId}`;
     // 01. Upload the file
-    const meta = { entity_id: internalId };
+    const meta = {};
     if (isAutoExternal) {
       const key = `${filePath}/${filename}`;
       meta.external_reference_id = generateStandardId(ENTITY_TYPE_EXTERNAL_REFERENCE, { url: `/storage/get/${key}` });
     }
-    const up = await upload(context, user, filePath, file, meta, noTriggerImport);
+    const up = await upload(context, user, filePath, file, { meta, noTriggerImport, entity: previous });
     // 02. Create and link external ref if needed.
     let addedExternalRef;
     if (isAutoExternal) {

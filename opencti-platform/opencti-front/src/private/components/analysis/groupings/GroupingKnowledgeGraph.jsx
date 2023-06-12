@@ -742,7 +742,7 @@ class GroupingKnowledgeGraphComponent extends Component {
           keyword: '',
         },
         () => {
-          this.saveParameters(false);
+          this.saveParameters(true);
           resolve(true);
         },
       );
@@ -1137,8 +1137,28 @@ class GroupingKnowledgeGraphComponent extends Component {
     );
   }
 
-  handleApplySuggestion() {
-    this.forceUpdate();
+  async handleApplySuggestion(createdRelationships) {
+    this.graphObjects = [...this.graphObjects, ...createdRelationships];
+    this.graphData = buildGraphData(
+      this.graphObjects,
+      decodeGraphData(this.props.grouping.x_opencti_graph_data),
+      this.props.t,
+    );
+    await this.resetAllFilters();
+    const selectedTimeRangeInterval = computeTimeRangeInterval(
+      this.graphObjects,
+    );
+    this.setState({
+      selectedTimeRangeInterval,
+      graphData: applyFilters(
+        this.graphData,
+        this.state.stixCoreObjectsTypes,
+        this.state.markedBy,
+        this.state.createdBy,
+        ignoredStixCoreObjectsTypes,
+        selectedTimeRangeInterval,
+      ),
+    });
   }
 
   handleTimeRangeChange(selectedTimeRangeInterval) {
@@ -1207,7 +1227,7 @@ class GroupingKnowledgeGraphComponent extends Component {
           container={grouping}
           PopoverComponent={<GroupingPopover />}
           link={`/dashboard/analysis/groupings/${grouping.id}/knowledge`}
-          modes={['graph', 'correlation', 'matrix']}
+          modes={['graph', 'content', 'correlation', 'matrix']}
           currentMode={mode}
           adjust={this.handleZoomToFit.bind(this)}
           knowledge={true}
@@ -1259,6 +1279,7 @@ class GroupingKnowledgeGraphComponent extends Component {
           timeRangeValues={timeRangeValues}
           handleSearch={this.handleSearch.bind(this)}
           navOpen={navOpen}
+          resetAllFilters={this.resetAllFilters.bind(this)}
         />
         {selectedEntities.length > 0 && (
           <EntitiesDetailsRightsBar

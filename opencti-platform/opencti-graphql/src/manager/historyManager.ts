@@ -22,6 +22,7 @@ import { getEntitiesMapFromCache } from '../database/cache';
 import type { AuthContext } from '../types/user';
 import { ENTITY_TYPE_IDENTITY_ORGANIZATION } from '../schema/stixDomainObject';
 import { OrderingMode } from '../generated/graphql';
+import { extractStixRepresentative } from '../database/stix-representative';
 
 const HISTORY_ENGINE_KEY = conf.get('history_manager:lock_key');
 const SCHEDULE_TIME = 10000;
@@ -29,6 +30,7 @@ const SCHEDULE_TIME = 10000;
 interface HistoryContext {
   id: string;
   entity_type: string;
+  entity_name: string;
   message: string;
   from_id?: string | undefined;
   to_id?: string | undefined;
@@ -36,7 +38,7 @@ interface HistoryContext {
   external_references?: Array<string>;
 }
 
-interface HistoryData extends BasicStoreEntity {
+export interface HistoryData extends BasicStoreEntity {
   event_type: string;
   timestamp: string;
   entity_type: 'History';
@@ -76,6 +78,7 @@ const eventsApplyHandler = async (context: AuthContext, events: Array<SseEvent<S
       id: stix.extensions[STIX_EXT_OCTI].id,
       message: event.data.message,
       entity_type: stix.extensions[STIX_EXT_OCTI].type,
+      entity_name: extractStixRepresentative(stix),
     };
     if (event.data.type === EVENT_TYPE_UPDATE) {
       const updateEvent: UpdateEvent = event.data as UpdateEvent;
@@ -116,6 +119,8 @@ const eventsApplyHandler = async (context: AuthContext, events: Array<SseEvent<S
       entity_type: ENTITY_TYPE_HISTORY,
       event_type: event.event,
       user_id: event.data.origin?.user_id,
+      group_ids: event.data.origin?.group_ids ?? [],
+      organization_ids: event.data.origin?.organization_ids ?? [],
       applicant_id: event.data.origin?.applicant_id,
       timestamp: eventDate,
       context_data: contextData,
@@ -192,6 +197,7 @@ const initHistoryManager = () => {
         connectionFormat: false,
         orderBy: ['timestamp'],
         orderMode: OrderingMode.Desc,
+        filters: [{ key: 'event_type', values: ['create'] }]
       });
       let lastEventId = '0-0';
       if (histoElements.length > 0) {
