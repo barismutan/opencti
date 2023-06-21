@@ -66,7 +66,7 @@ ContainerStixObjectsOrStixRelationshipsComponentProps
     },
     name: {
       label: 'Name',
-      width: '25%',
+      width: '30%',
       isSortable: true,
     },
     createdBy: {
@@ -74,25 +74,20 @@ ContainerStixObjectsOrStixRelationshipsComponentProps
       width: '12%',
       isSortable: isRuntimeSort,
     },
-    creator: {
-      label: 'Creator',
-      width: '12%',
-      isSortable: isRuntimeSort,
-    },
     objectLabel: {
       label: 'Labels',
-      width: '15%',
+      width: '12%',
       isSortable: false,
     },
     created_at: {
       label: 'Creation date',
-      width: '15%',
+      width: '12%',
       isSortable: true,
     },
     objectMarking: {
       label: 'Marking',
       isSortable: isRuntimeSort,
-      width: '8%',
+      width: '15%',
     },
   };
   return (

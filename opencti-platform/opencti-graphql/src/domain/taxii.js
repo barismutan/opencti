@@ -8,7 +8,7 @@ import {
   READ_STIX_INDICES
 } from '../database/utils';
 import { generateInternalId, generateStandardId } from '../schema/identifier';
-import { ENTITY_TYPE_FEED, ENTITY_TYPE_TAXII_COLLECTION } from '../schema/internalObject';
+import { ENTITY_TYPE_TAXII_COLLECTION } from '../schema/internalObject';
 import { deleteElementById, updateAttribute, stixLoadByIds } from '../database/middleware';
 import { listEntities, storeLoadById } from '../database/middleware-loader';
 import { FunctionalError, ResourceNotFoundError } from '../config/errors';
@@ -32,10 +32,11 @@ export const createTaxiiCollection = async (context, user, input) => {
   await elIndex(INDEX_INTERNAL_OBJECTS, data);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
+    event_type: 'mutation',
+    event_scope: 'create',
+    event_access: 'administration',
     message: `creates Taxii collection \`${input.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_TAXII_COLLECTION, operation: 'create', input }
+    context_data: { entity_type: ENTITY_TYPE_TAXII_COLLECTION, input }
   });
   return data;
 };
@@ -49,10 +50,11 @@ export const taxiiCollectionEditField = async (context, user, collectionId, inpu
   const { element } = await updateAttribute(context, user, collectionId, ENTITY_TYPE_TAXII_COLLECTION, input);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
+    event_type: 'mutation',
+    event_scope: 'update',
+    event_access: 'administration',
     message: `updates \`${input.map((i) => i.key).join(', ')}\` for Taxii collection \`${element.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_FEED, operation: 'update', input }
+    context_data: { entity_type: ENTITY_TYPE_TAXII_COLLECTION, input }
   });
   return notify(BUS_TOPICS[ENTITY_TYPE_TAXII_COLLECTION].EDIT_TOPIC, element, user);
 };
@@ -60,10 +62,11 @@ export const taxiiCollectionDelete = async (context, user, collectionId) => {
   const deleted = await deleteElementById(context, user, collectionId, ENTITY_TYPE_TAXII_COLLECTION);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
+    event_type: 'mutation',
+    event_scope: 'delete',
+    event_access: 'administration',
     message: `deletes Taxii collection \`${deleted.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_TAXII_COLLECTION, operation: 'delete', input: deleted }
+    context_data: { entity_type: ENTITY_TYPE_TAXII_COLLECTION, input: deleted }
   });
   return collectionId;
 };

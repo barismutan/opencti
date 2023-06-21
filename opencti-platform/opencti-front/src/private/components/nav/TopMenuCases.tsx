@@ -2,13 +2,14 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import {
-  BiotechOutlined,
-  TipsAndUpdatesOutlined,
-  PowerSettingsNewOutlined,
-} from '@mui/icons-material';
+  BriefcaseEyeOutline,
+  BriefcaseSearchOutline,
+  BriefcaseRemoveOutline,
+  BriefcaseEditOutline,
+} from 'mdi-material-ui';
+import { TaskAltOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles/createTheme';
-import { Brain } from 'mdi-material-ui';
 import { useFormatter } from '../../../components/i18n';
 import { useIsHiddenEntity } from '../../../utils/hooks/useEntitySettings';
 
@@ -48,8 +49,8 @@ const TopMenuCases = () => {
           }
           classes={{ root: classes.button }}
         >
-          <BiotechOutlined className={classes.icon} fontSize="small" />
-          {t('Incident response')}
+          <BriefcaseEyeOutline className={classes.icon} fontSize="small" />
+          {t('Incident responses')}
         </Button>
       )}
       {!useIsHiddenEntity('Case-Rfi') && (
@@ -67,7 +68,7 @@ const TopMenuCases = () => {
           }
           classes={{ root: classes.button }}
         >
-          <Brain className={classes.icon} fontSize="small" />
+          <BriefcaseSearchOutline className={classes.icon} fontSize="small" />
           {t('Requests for information')}
         </Button>
       )}
@@ -86,8 +87,29 @@ const TopMenuCases = () => {
           }
           classes={{ root: classes.button }}
         >
-          <PowerSettingsNewOutlined className={classes.icon} fontSize="small" />
+          <BriefcaseRemoveOutline className={classes.icon} fontSize="small" />
           {t('Requests for takedown')}
+        </Button>
+      )}
+      {!useIsHiddenEntity('Task') && (
+        <Button
+          component={Link}
+          to="/dashboard/cases/tasks"
+          variant={
+            location.pathname === '/dashboard/cases/tasks'
+              ? 'contained'
+              : 'text'
+          }
+          size="small"
+          color={
+            location.pathname === '/dashboard/cases/tasks'
+              ? 'secondary'
+              : 'primary'
+          }
+          classes={{ root: classes.button }}
+        >
+          <TaskAltOutlined className={classes.icon} fontSize="small" />
+          {t('Tasks')}
         </Button>
       )}
       {!useIsHiddenEntity('Feedback') && (
@@ -107,7 +129,7 @@ const TopMenuCases = () => {
           }
           classes={{ root: classes.button }}
         >
-          <TipsAndUpdatesOutlined className={classes.icon} fontSize="small" />
+          <BriefcaseEditOutline className={classes.icon} fontSize="small" />
           {t('Feedbacks')}
         </Button>
       )}

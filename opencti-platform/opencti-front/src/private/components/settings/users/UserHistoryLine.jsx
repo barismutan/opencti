@@ -12,6 +12,8 @@ import {
   deepPurple,
   indigo,
   red,
+  lightGreen,
+  orange,
 } from '@mui/material/colors';
 import withStyles from '@mui/styles/withStyles';
 import Paper from '@mui/material/Paper';
@@ -23,6 +25,8 @@ import {
   LinkOutlined,
   LinkOffOutlined,
   DeleteOutlined,
+  VisibilityOutlined,
+  DownloadOutlined,
 } from '@mui/icons-material';
 import { LinkVariantPlus, LinkVariantRemove, Merge } from 'mdi-material-ui';
 import Tooltip from '@mui/material/Tooltip';
@@ -98,7 +102,7 @@ class UserHistoryLineComponent extends Component {
     this.setState({ open: false });
   }
 
-  renderIcon(eventType, isRelation, eventMesage, commit) {
+  renderIcon(eventType, isRelation, eventMessage, commit) {
     if (isRelation) {
       if (eventType === 'create') {
         return (
@@ -165,7 +169,7 @@ class UserHistoryLineComponent extends Component {
           </Avatar>
         );
       }
-      if (eventType === 'update' && eventMesage.includes('replaces')) {
+      if (eventType === 'update' && (eventMessage.includes('replaces') || eventMessage.includes('updates'))) {
         return (
           <Avatar
             sx={{
@@ -181,7 +185,7 @@ class UserHistoryLineComponent extends Component {
           </Avatar>
         );
       }
-      if (eventType === 'update' && eventMesage.includes('changes')) {
+      if (eventType === 'update' && eventMessage.includes('changes')) {
         return (
           <Avatar
             sx={{
@@ -197,7 +201,7 @@ class UserHistoryLineComponent extends Component {
           </Avatar>
         );
       }
-      if (eventType === 'update' && eventMesage.includes('adds')) {
+      if (eventType === 'update' && eventMessage.includes('adds')) {
         return (
           <Avatar
             sx={{
@@ -213,7 +217,7 @@ class UserHistoryLineComponent extends Component {
           </Avatar>
         );
       }
-      if (eventType === 'update' && eventMesage.includes('removes')) {
+      if (eventType === 'update' && eventMessage.includes('removes')) {
         return (
           <Avatar
             sx={{
@@ -243,13 +247,42 @@ class UserHistoryLineComponent extends Component {
           </Avatar>
         );
       }
+      if (eventType === 'read') {
+        return (
+          <Avatar
+            sx={{
+              width: 30,
+              height: 30,
+              backgroundColor: lightGreen[700],
+              color: '#ffffff',
+            }}
+          >
+            <VisibilityOutlined fontSize="small" />
+          </Avatar>
+        );
+      }
+      if (eventType === 'download') {
+        return (
+          <Avatar
+            sx={{
+              width: 30,
+              height: 30,
+              backgroundColor: orange[800],
+              color: '#ffffff',
+            }}
+          >
+            <DownloadOutlined fontSize="small" />
+          </Avatar>
+        );
+      }
     }
     return (
       <Avatar
-        style={{
-          backgroundColor: yellow[800],
+        sx={{
+          width: 30,
+          height: 30,
+          backgroundColor: yellow[500],
           color: '#ffffff',
-          cursor: commit ? 'pointer' : 'auto',
         }}
         onClick={() => commit && this.handleOpen()}
       >

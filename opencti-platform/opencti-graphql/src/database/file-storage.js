@@ -14,7 +14,6 @@ import { buildPagination } from './utils';
 import { connectorsForImport } from './repository';
 import { pushToConnector } from './rabbitmq';
 import { telemetry } from '../config/tracing';
-import { buildContextDataForFile, publishUserAction } from '../listener/UserActionListener';
 
 // Minio configuration
 const clientEndpoint = conf.get('minio:endpoint');
@@ -90,13 +89,14 @@ export const deleteBucket = async () => {
 export const isStorageAlive = () => initializeBucket();
 
 export const deleteFile = async (context, user, id) => {
+  const up = await loadFile(context, user, id);
   logApp.debug(`[FILE STORAGE] delete file ${id} by ${user.user_email}`);
   await s3Client.send(new s3.DeleteObjectCommand({
     Bucket: bucketName,
     Key: id
   }));
   await deleteWorkForFile(context, user, id);
-  return true;
+  return up;
 };
 
 export const deleteFiles = async (context, user, ids) => {
@@ -246,6 +246,7 @@ export const uploadJobImport = async (context, user, fileId, fileMime, entityId,
     };
     await Promise.all(R.map((data) => pushMessage(data), actionList));
   }
+  return connectors;
 };
 
 export const upload = async (context, user, path, fileUpload, opts) => {
@@ -296,8 +297,6 @@ export const upload = async (context, user, path, fileUpload, opts) => {
     metaData: { ...fullMetadata, messages: [], errors: [] },
     uploadStatus: 'complete'
   };
-  const contextData = buildContextDataForFile(entity, path, filename);
-  await publishUserAction({ user, event_type: 'upload', status: 'success', context_data: contextData });
   // Trigger a enrich job for import file if needed
   if (!noTriggerImport && path.startsWith('import/') && !path.startsWith('import/pending') && !path.startsWith('import/External-Reference')) {
     await uploadJobImport(context, user, file.id, file.metaData.mimetype, file.metaData.entity_id);

@@ -10,14 +10,14 @@ import ToolBar from '../data/ToolBar';
 import Security from '../../../utils/Security';
 import { KNOWLEDGE_KNUPDATE } from '../../../utils/hooks/useGranted';
 import ExportContextProvider from '../../../utils/ExportContextProvider';
-import CaseRftsLines, { caseRftsLinesQuery } from './case_rft/CaseRftLines';
+import CaseRftsLines, { caseRftsLinesQuery } from './case_rfts/CaseRftLines';
 import {
   CaseRftLinesCasesPaginationQuery,
   CaseRftLinesCasesPaginationQuery$variables,
-} from './case_rft/__generated__/CaseRftLinesCasesPaginationQuery.graphql';
-import { CaseRftLineCase_node$data } from './case_rft/__generated__/CaseRftLineCase_node.graphql';
-import { CaseRftLineDummy } from './case_rft/CaseRftLine';
-import CaseRftCreation from './case_rft/CaseRftCreation';
+} from './case_rfts/__generated__/CaseRftLinesCasesPaginationQuery.graphql';
+import { CaseRftLineCase_node$data } from './case_rfts/__generated__/CaseRftLineCase_node.graphql';
+import { CaseRftLineDummy } from './case_rfts/CaseRftLine';
+import CaseRftCreation from './case_rfts/CaseRftCreation';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -29,7 +29,7 @@ interface CaseRftsProps {
   inputValue?: string;
 }
 
-export const LOCAL_STORAGE_KEY_CASE_RFT = 'view-cases-casesRfts';
+export const LOCAL_STORAGE_KEY_CASE_RFT = 'view-caseRfts';
 
 const CaseRfts: FunctionComponent<CaseRftsProps> = () => {
   const classes = useStyles();

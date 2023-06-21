@@ -15,7 +15,7 @@ interface StixCoreObjectOrStixCoreRelationshipNotesProps {
   stixCoreObjectOrStixCoreRelationshipId: string;
   marginTop?: number;
   isRelationship?: boolean;
-  defaultMarkings?: { id: string; definition: string | null }[];
+  defaultMarkings?: { id: string; definition: string | null, x_opencti_color: string | null }[];
 }
 
 const StixCoreObjectOrStixCoreRelationshipNotes: FunctionComponent<
@@ -58,7 +58,7 @@ StixCoreObjectOrStixCoreRelationshipNotesProps
       {queryRef && (
         <React.Suspense
           fallback={
-            <div style={{ height: '100%', marginTop: marginTop || 50 }}>
+            <div style={{ height: '100%', marginTop: marginTop || 55 }}>
               <Typography
                 variant="h4"
                 gutterBottom={true}

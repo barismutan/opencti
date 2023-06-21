@@ -53,18 +53,8 @@ const eventsApplyHandler = async (context: AuthContext, events: Array<SseEvent<S
   }
   const markingsById = await getEntitiesMapFromCache<BasicRuleEntity>(context, SYSTEM_USER, ENTITY_TYPE_MARKING_DEFINITION);
   const organizationsById = await getEntitiesMapFromCache<BasicStoreEntity>(context, SYSTEM_USER, ENTITY_TYPE_IDENTITY_ORGANIZATION);
-  const filteredEvents = events.filter((event) => {
-    // Filter update events with only files modification
-    if (event.event === EVENT_TYPE_UPDATE) {
-      const { patch } = (event.data as UpdateEvent).context;
-      const noFilePatches = patch.filter((p) => !p.path.startsWith(`/extensions/${STIX_EXT_OCTI}/files`));
-      return noFilePatches.length > 0;
-    }
-    // Deletion and creation events are not filtered
-    return true;
-  });
   // Build the history data
-  const historyElements = filteredEvents.map((event) => {
+  const historyElements = events.map((event) => {
     const [time] = event.id.split('-');
     const eventDate = utcDate(parseInt(time, 10)).toISOString();
     const stix = event.data.data;
@@ -117,7 +107,8 @@ const eventsApplyHandler = async (context: AuthContext, events: Array<SseEvent<S
       created_at: activityDate,
       updated_at: activityDate,
       entity_type: ENTITY_TYPE_HISTORY,
-      event_type: event.event,
+      event_type: 'mutation',
+      event_scope: event.event,
       user_id: event.data.origin?.user_id,
       group_ids: event.data.origin?.group_ids ?? [],
       organization_ids: event.data.origin?.organization_ids ?? [],
@@ -155,8 +146,8 @@ const initHistoryManager = () => {
   const WAIT_TIME_ACTION = 2000;
   let scheduler: SetIntervalAsyncTimer<[]>;
   let streamProcessor: StreamProcessor;
-  let syncListening = true;
   let running = false;
+  let shutdown = false;
   const wait = (ms: number) => {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
@@ -171,9 +162,10 @@ const initHistoryManager = () => {
       logApp.info('[OPENCTI-MODULE] Running history manager');
       streamProcessor = createStreamProcessor(SYSTEM_USER, 'History manager', historyStreamHandler);
       await streamProcessor.start(lastEventId);
-      while (syncListening) {
+      while (!shutdown && streamProcessor.running()) {
         await wait(WAIT_TIME_ACTION);
       }
+      logApp.info('[OPENCTI-MODULE] End of history manager processing');
     } catch (e: any) {
       if (e.name === TYPE_LOCK_ERROR) {
         logApp.debug('[OPENCTI-MODULE] History manager already started by another API');
@@ -197,7 +189,7 @@ const initHistoryManager = () => {
         connectionFormat: false,
         orderBy: ['timestamp'],
         orderMode: OrderingMode.Desc,
-        filters: [{ key: 'event_type', values: ['create'] }]
+        filters: [{ key: ['event_access'], values: [null] }]
       });
       let lastEventId = '0-0';
       if (histoElements.length > 0) {
@@ -206,9 +198,7 @@ const initHistoryManager = () => {
       }
       // Start the listening of events
       scheduler = setIntervalAsync(async () => {
-        if (syncListening) {
-          await historyHandler(lastEventId);
-        }
+        await historyHandler(lastEventId);
       }, SCHEDULE_TIME);
     },
     status: () => {
@@ -219,7 +209,8 @@ const initHistoryManager = () => {
       };
     },
     shutdown: async () => {
-      syncListening = false;
+      logApp.info('[OPENCTI-MODULE] Stopping history manager');
+      shutdown = true;
       if (scheduler) {
         await clearIntervalAsync(scheduler);
       }

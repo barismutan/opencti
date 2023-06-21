@@ -71,7 +71,14 @@ import { isStixObject } from '../schema/stixCoreObject';
 import { isBasicRelationship, isStixRelationshipExceptRef } from '../schema/stixRelationship';
 import { RELATION_INDICATES } from '../schema/stixCoreRelationship';
 import { INTERNAL_FROM_FIELD, INTERNAL_TO_FIELD } from '../schema/identifier';
-import { computeUserMemberAccessIds, isBypassUser, MEMBER_ACCESS_ALL } from '../utils/access';
+import {
+  computeUserMemberAccessIds,
+  INTERNAL_USERS,
+  isBypassUser,
+  isUserHasCapability,
+  MEMBER_ACCESS_ALL,
+  SETTINGS_SET_ACCESSES
+} from '../utils/access';
 import { isSingleRelationsRef, } from '../schema/stixEmbeddedRelationship';
 import { now, runtimeFieldObservableValueScript } from '../utils/format';
 import { ENTITY_TYPE_MARKING_DEFINITION } from '../schema/stixMetaObject';
@@ -272,6 +279,10 @@ const buildDataRestrictions = async (context, user, opts = {}) => {
   const must = [];
   // eslint-disable-next-line camelcase
   const must_not = [];
+  // If internal users of the system, we cancel rights checking
+  if (INTERNAL_USERS[user.id]) {
+    return { must, must_not };
+  }
   // check user access
   must.push(...buildUserMemberAccessFilter(user, opts?.adminBypassUserAccess));
   // If user have bypass, no need to check restrictions
@@ -377,13 +388,13 @@ const buildDataRestrictions = async (context, user, opts = {}) => {
   return { must, must_not };
 };
 
-export const buildUserMemberAccessFilter = (user, adminBypassUserAccess = true) => {
-  if (adminBypassUserAccess && isBypassUser(user)) {
+export const buildUserMemberAccessFilter = (user, adminBypassUserAccess = false) => {
+  if (adminBypassUserAccess && isUserHasCapability(user, SETTINGS_SET_ACCESSES)) {
     return [];
   }
   const userAccessIds = computeUserMemberAccessIds(user);
   // if access_users exists, it should have the user access ids
-  const memberAccessFilter = [{
+  return [{
     bool: {
       should: [
         {
@@ -397,7 +408,6 @@ export const buildUserMemberAccessFilter = (user, adminBypassUserAccess = true) 
       ]
     }
   }];
-  return memberAccessFilter;
 };
 
 export const elIndexExists = async (indexName) => {
@@ -704,6 +714,32 @@ export const RUNTIME_ATTRIBUTES = {
       return R.mergeAll(identities.map((i) => ({ [i.internal_id]: i.definition })));
     },
   },
+  assigneeTo: {
+    field: 'assigneeTo.keyword',
+    type: 'keyword',
+    getSource: async () => `
+        if (doc.containsKey('rel_object-assignee.internal_id')) {
+          def assigneeId = doc['rel_object-assignee.internal_id.keyword'];
+          if (assigneeId.size() >= 1) {
+            def assigneeName = params[assigneeId[0]].toLowerCase();
+            emit(assigneeName != null ? assigneeName : 'unknown')
+          } else {
+              emit('unknown')
+            }
+        } else {
+          emit('unknown')
+        }
+    `,
+    getParams: async (context, user) => {
+      // eslint-disable-next-line no-use-before-define
+      const users = await elPaginate(context, user, READ_INDEX_INTERNAL_OBJECTS, {
+        types: [ENTITY_TYPE_USER],
+        first: MAX_SEARCH_SIZE,
+        connectionFormat: false,
+      });
+      return R.mergeAll(users.map((i) => ({ [i.internal_id]: i.name.replace(/[&/\\#,+[\]()$~%.'":*?<>{}]/g, '') })));
+    },
+  },
 };
 
 // region relation reconstruction
@@ -843,6 +879,7 @@ export const elFindByIds = async (context, user, ids, opts = {}) => {
   const { indices = READ_DATA_INDICES, baseData = false, baseFields = BASE_FIELDS } = opts;
   const { withoutRels = false, toMap = false, type = null, forceAliases = false } = opts;
   const idsArray = Array.isArray(ids) ? ids : [ids];
+  const types = (Array.isArray(type) || !type) ? type : [type];
   const processIds = R.filter((id) => isNotEmptyField(id), idsArray);
   if (processIds.length === 0) {
     return toMap ? {} : [];
@@ -854,7 +891,7 @@ export const elFindByIds = async (context, user, ids, opts = {}) => {
     const workingIds = groupIds[index];
     const idsTermsPerType = [];
     const elementTypes = [ID_INTERNAL, ID_STANDARD, IDS_STIX];
-    if (isStixObjectAliased(type) || forceAliases) {
+    if ((types || []).some((typeElement) => isStixObjectAliased(typeElement)) || forceAliases) {
       elementTypes.push(INTERNAL_IDS_ALIASES);
     }
     for (let indexType = 0; indexType < elementTypes.length; indexType += 1) {
@@ -869,19 +906,24 @@ export const elFindByIds = async (context, user, ids, opts = {}) => {
       },
     };
     mustTerms.push(should);
-    if (type) {
+    if (types && types.length > 0) {
+      const typesShould = types.map((typeShould) => (
+        [
+          { match_phrase: { 'entity_type.keyword': typeShould } },
+          { match_phrase: { 'parent_types.keyword': typeShould } }
+        ]
+      )).flat();
       const shouldType = {
         bool: {
-          should: [
-            { match_phrase: { 'entity_type.keyword': type } },
-            { match_phrase: { 'parent_types.keyword': type } },
-          ],
+          should: typesShould,
           minimum_should_match: 1,
         },
       };
       mustTerms.push(shouldType);
     }
-    const markingRestrictions = await buildDataRestrictions(context, user);
+    const restrictionOptions = { adminBypassUserAccess: true }; // Bypass the members restrictions if possible
+    // If an admin ask for a specific element, there is no need to ask him to explicitly extends his visibility to doing it.
+    const markingRestrictions = await buildDataRestrictions(context, user, restrictionOptions);
     mustTerms.push(...markingRestrictions.must);
     const body = {
       query: {
@@ -903,7 +945,7 @@ export const elFindByIds = async (context, user, ids, opts = {}) => {
       body,
     };
     logApp.debug('[SEARCH] elInternalLoadById', { query });
-    const searchType = `${ids} (${type !== null ? type : 'Any'})`;
+    const searchType = `${ids} (${types ? types.join(', ') : 'Any'})`;
     const data = await elRawSearch(context, user, searchType, query).catch((err) => {
       throw DatabaseError('[SEARCH] Error loading ids', { error: err, query });
     });
@@ -1060,7 +1102,7 @@ const elQueryBodyBuilder = async (context, user, options) => {
   const dateFilter = [];
   const searchAfter = after ? cursorToOffset(after) : undefined;
   let ordering = [];
-  const { adminBypassUserAccess = true } = options;
+  const { adminBypassUserAccess = false } = options;
   const markingRestrictions = await buildDataRestrictions(context, user, { adminBypassUserAccess });
   const accessMust = markingRestrictions.must;
   const accessMustNot = markingRestrictions.must_not;
@@ -1278,10 +1320,11 @@ const elQueryBodyBuilder = async (context, user, options) => {
       const orderCriteria = orderCriterion[index];
       const isDateOrNumber = isDateNumericOrBooleanAttribute(orderCriteria);
       const orderKeyword = isDateOrNumber || orderCriteria.startsWith('_') ? orderCriteria : `${orderCriteria}.keyword`;
-      const order = { [orderKeyword]: orderMode };
-      ordering = R.append(order, ordering);
-      if (!orderKeyword.startsWith('_')) {
-        mustFilters.push({ exists: { field: orderKeyword } });
+      if (orderKeyword === '_score') {
+        ordering = R.append({ [orderKeyword]: orderMode }, ordering);
+      } else {
+        const order = { [orderKeyword]: { order: orderMode, missing: '_last' } };
+        ordering = R.append(order, ordering);
       }
     }
     // Add standard_id if not specify to ensure ordering uniqueness

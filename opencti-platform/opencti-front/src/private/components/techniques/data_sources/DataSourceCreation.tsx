@@ -32,6 +32,7 @@ import ConfidenceField from '../../common/form/ConfidenceField';
 import OpenVocabField from '../../common/form/OpenVocabField';
 import { useSchemaCreationValidation } from '../../../../utils/hooks/useEntitySettings';
 import { DataSourceCreationMutation$variables } from './__generated__/DataSourceCreationMutation.graphql';
+import useDefaultValues from '../../../../utils/hooks/useDefaultValues';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   drawerPaper: {
@@ -105,7 +106,7 @@ interface DataSourceAddInput {
   objectMarking: Option[];
   objectLabel: Option[];
   externalReferences: Option[];
-  confidence: number;
+  confidence: number | undefined;
   x_mitre_platforms: string[];
   collection_layers: string[];
   file: File | undefined;
@@ -128,6 +129,8 @@ interface DataSourceFormProps {
   defaultConfidence?: number;
 }
 
+const DATA_SOURCE_TYPE = 'Data-Source';
+
 export const DataSourceCreationForm: FunctionComponent<DataSourceFormProps> = ({
   updater,
   onReset,
@@ -145,21 +148,10 @@ export const DataSourceCreationForm: FunctionComponent<DataSourceFormProps> = ({
     confidence: Yup.number().nullable(),
   };
   const dataSourceValidator = useSchemaCreationValidation(
-    'Data-Source',
+    DATA_SOURCE_TYPE,
     basicShape,
   );
-  const initialValues: DataSourceAddInput = {
-    name: inputValue || '',
-    description: '',
-    createdBy: defaultCreatedBy ?? ('' as unknown as Option),
-    objectMarking: defaultMarkingDefinitions ?? [],
-    objectLabel: [],
-    externalReferences: [],
-    confidence: defaultConfidence ?? 75,
-    x_mitre_platforms: [],
-    collection_layers: [],
-    file: undefined,
-  };
+
   const [commit] = useMutation(dataSourceMutation);
   const onSubmit: FormikConfig<DataSourceAddInput>['onSubmit'] = (
     values: DataSourceAddInput,
@@ -199,6 +191,19 @@ export const DataSourceCreationForm: FunctionComponent<DataSourceFormProps> = ({
       },
     });
   };
+
+  const initialValues = useDefaultValues<DataSourceAddInput>(DATA_SOURCE_TYPE, {
+    name: inputValue || '',
+    description: '',
+    createdBy: defaultCreatedBy,
+    objectMarking: defaultMarkingDefinitions ?? [],
+    objectLabel: [],
+    externalReferences: [],
+    confidence: defaultConfidence,
+    x_mitre_platforms: [],
+    collection_layers: [],
+    file: undefined,
+  });
 
   return (
     <Formik<DataSourceAddInput>
@@ -267,9 +272,20 @@ export const DataSourceCreationForm: FunctionComponent<DataSourceFormProps> = ({
             component={SimpleFileUpload}
             name="file"
             label={t('Associated file')}
-            FormControlProps={{ style: { marginTop: 20, width: '100%' } }}
-            InputLabelProps={{ fullWidth: true, variant: 'standard' }}
-            InputProps={{ fullWidth: true, variant: 'standard' }}
+            FormControlProps={{
+              style: {
+                marginTop: 20,
+                width: '100%',
+              },
+            }}
+            InputLabelProps={{
+              fullWidth: true,
+              variant: 'standard',
+            }}
+            InputProps={{
+              fullWidth: true,
+              variant: 'standard',
+            }}
             fullWidth={true}
           />
           <OpenVocabField

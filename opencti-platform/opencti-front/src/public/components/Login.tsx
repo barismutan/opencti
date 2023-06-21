@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import Button from "@mui/material/Button";
 import { useTheme } from "@mui/styles";
 import { Facebook, Github, Google, KeyOutline } from "mdi-material-ui";
@@ -16,6 +16,7 @@ import { Theme } from "../../components/Theme";
 import { LoginRootPublicQuery$data } from "../__generated__/LoginRootPublicQuery.graphql";
 import { useFormatter } from "../../components/i18n";
 import { isNotEmptyField } from "../../utils/utils";
+import useDimensions from "../../utils/hooks/useDimensions";
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -82,7 +83,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   paper: {
     margin: "0 auto 20px auto",
-    padding: 5,
+    padding: 10,
     textAlign: "center",
     maxWidth: 500,
   },
@@ -100,19 +101,7 @@ const Login: FunctionComponent<LoginProps> = ({ type, settings }) => {
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
-
-  // eslint-disable-next-line max-len
-  const [dimension, setDimension] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-  const updateWindowDimensions = () => {
-    setDimension({ width: window.innerWidth, height: window.innerHeight });
-  };
-  useEffect(() => {
-    window.addEventListener("resize", updateWindowDimensions);
-    return () => window.removeEventListener("resize", updateWindowDimensions);
-  });
+  const { dimension } = useDimensions();
   const renderExternalAuthButton = (provider: string | null) => {
     switch (provider) {
       case "facebook":
@@ -260,7 +249,7 @@ const Login: FunctionComponent<LoginProps> = ({ type, settings }) => {
             alt="logo"
             className={classes.logo}
           />
-          <Paper variant="outlined">
+          <Paper classes={{ root: classes.paper }} variant="outlined">
             <OTPForm />
           </Paper>
         </div>

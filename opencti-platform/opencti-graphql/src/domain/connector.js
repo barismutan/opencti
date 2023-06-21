@@ -68,10 +68,11 @@ export const resetStateConnector = async (context, user, id) => {
   const { element } = await patchAttribute(context, user, id, ENTITY_TYPE_CONNECTOR, patch);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
-    message: `resets \`state\` for connector \`${element.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_CONNECTOR, operation: 'update', input: { id } }
+    event_type: 'mutation',
+    event_scope: 'update',
+    event_access: 'administration',
+    message: `resets \`state\` for ${ENTITY_TYPE_CONNECTOR} \`${element.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_CONNECTOR, input: { id } }
   });
   return storeLoadById(context, user, id, ENTITY_TYPE_CONNECTOR).then((data) => completeConnector(data));
 };
@@ -107,6 +108,14 @@ export const registerConnector = async (context, user, connectorData) => {
     connector_user_id: user.id,
   };
   const createdConnector = await createEntity(context, user, connectorToCreate, ENTITY_TYPE_CONNECTOR);
+  await publishUserAction({
+    user,
+    event_type: 'mutation',
+    event_scope: 'create',
+    event_access: 'administration',
+    message: `creates ${ENTITY_TYPE_CONNECTOR} \`${createdConnector.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_CONNECTOR, input: connectorData }
+  });
   // Notify configuration change for caching system
   await notify(BUS_TOPICS[ABSTRACT_INTERNAL_OBJECT].ADDED_TOPIC, createdConnector, user);
   // Return the connector
@@ -118,10 +127,11 @@ export const connectorDelete = async (context, user, connectorId) => {
   const { element } = await internalDeleteElementById(context, user, connectorId);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
-    message: `deletes connector \`${element.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_CONNECTOR, operation: 'delete', input: element }
+    event_type: 'mutation',
+    event_scope: 'delete',
+    event_access: 'administration',
+    message: `deletes ${ENTITY_TYPE_CONNECTOR} \`${element.name}\``,
+    context_data: { entity_type: ENTITY_TYPE_CONNECTOR, input: element }
   });
   // Notify configuration change for caching system
   await notify(BUS_TOPICS[ABSTRACT_INTERNAL_OBJECT].DELETE_TOPIC, element, user);
@@ -217,10 +227,11 @@ export const registerSync = async (context, user, syncData) => {
   if (isCreation) {
     await publishUserAction({
       user,
-      event_type: 'admin',
-      status: 'success',
+      event_type: 'mutation',
+      event_scope: 'create',
+      event_access: 'administration',
       message: `creates synchronizer \`${syncData.name}\``,
-      context_data: { entity_type: ENTITY_TYPE_SYNC, operation: 'create', input: data }
+      context_data: { entity_type: ENTITY_TYPE_SYNC, input: data }
     });
   }
   return element;
@@ -229,10 +240,11 @@ export const syncEditField = async (context, user, syncId, input) => {
   const { element } = await updateAttribute(context, user, syncId, ENTITY_TYPE_SYNC, input);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
+    event_type: 'mutation',
+    event_scope: 'update',
+    event_access: 'administration',
     message: `updates \`${input.map((i) => i.key).join(', ')}\` for synchronizer \`${element.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_SYNC, operation: 'update', input }
+    context_data: { entity_type: ENTITY_TYPE_SYNC, input }
   });
   return notify(BUS_TOPICS[ENTITY_TYPE_SYNC].EDIT_TOPIC, element, user);
 };
@@ -240,10 +252,11 @@ export const syncDelete = async (context, user, syncId) => {
   const deleted = await deleteElementById(context, user, syncId, ENTITY_TYPE_SYNC);
   await publishUserAction({
     user,
-    event_type: 'admin',
-    status: 'success',
+    event_type: 'mutation',
+    event_scope: 'delete',
+    event_access: 'administration',
     message: `deletes synchronizer \`${deleted.name}\``,
-    context_data: { entity_type: ENTITY_TYPE_SYNC, operation: 'delete', input: deleted }
+    context_data: { entity_type: ENTITY_TYPE_SYNC, input: deleted }
   });
   return syncId;
 };

@@ -59,8 +59,8 @@ schemaAttributesDefinition.registerAttributes(ENTITY_TYPE_IDENTITY, stixDomainOb
 const stixDomainObjectLocationAttributes: Array<AttributeDefinition> = [
   { name: 'name', type: 'string', mandatoryType: 'external', multiple: false, upsert: true },
   { name: 'description', type: 'string', mandatoryType: 'customizable', multiple: false, upsert: true },
-  { name: 'latitude', type: 'string', mandatoryType: 'no', multiple: false, upsert: true },
-  { name: 'longitude', type: 'string', mandatoryType: 'no', multiple: false, upsert: true },
+  { name: 'latitude', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: true },
+  { name: 'longitude', type: 'numeric', mandatoryType: 'no', multiple: false, upsert: true },
   { name: 'precision', type: 'string', mandatoryType: 'no', multiple: false, upsert: false },
   entityLocationType,
 ];
@@ -121,7 +121,7 @@ const stixDomainObjectsAttributes: { [k: string]: Array<AttributeDefinition> } =
       upsert: true,
       label: 'Note types'
     },
-    { name: 'likelihood', type: 'string', mandatoryType: 'customizable', multiple: false, upsert: true },
+    { name: 'likelihood', type: 'string', mandatoryType: 'customizable', multiple: false, upsert: true, label: 'Likelihood' },
   ],
   [ENTITY_TYPE_CONTAINER_OBSERVED_DATA]: [
     {
@@ -190,7 +190,7 @@ const stixDomainObjectsAttributes: { [k: string]: Array<AttributeDefinition> } =
     {
       name: 'x_opencti_organization_type',
       type: 'string',
-      mandatoryType: 'customizable',
+      mandatoryType: 'no',
       multiple: false,
       upsert: false,
       label: 'Organization type'
@@ -198,7 +198,7 @@ const stixDomainObjectsAttributes: { [k: string]: Array<AttributeDefinition> } =
     {
       name: 'x_opencti_reliability',
       type: 'string',
-      mandatoryType: 'customizable',
+      mandatoryType: 'no',
       multiple: false,
       upsert: false,
       label: 'Reliability'
@@ -372,8 +372,8 @@ const stixDomainObjectsAttributes: { [k: string]: Array<AttributeDefinition> } =
     },
     { name: 'first_seen', type: 'date', mandatoryType: 'no', multiple: false, upsert: true },
     { name: 'last_seen', type: 'date', mandatoryType: 'no', multiple: false, upsert: true },
-    { name: 'architecture_execution_envs', type: 'string', mandatoryType: 'no', multiple: true, upsert: true },
-    { name: 'implementation_languages', type: 'string', mandatoryType: 'no', multiple: true, upsert: true },
+    { name: 'architecture_execution_envs', type: 'string', mandatoryType: 'customizable', multiple: true, upsert: true, label: 'Architecture execution env.' },
+    { name: 'implementation_languages', type: 'string', mandatoryType: 'customizable', multiple: true, upsert: true, label: 'Implementation languages' },
     { name: 'capabilities', type: 'string', mandatoryType: 'no', multiple: true, upsert: false },
   ],
   [ENTITY_TYPE_THREAT_ACTOR]: [

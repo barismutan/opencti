@@ -8,6 +8,8 @@ import {
   AccountBalanceOutlined,
   DomainOutlined,
   PublicOutlined,
+  ReportProblemOutlined,
+  CampaignOutlined,
   HelpOutlined,
   BugReportOutlined,
   DescriptionOutlined,
@@ -20,6 +22,7 @@ import {
   LogoutOutlined,
   ManageAccountsOutlined,
   WorkOutline,
+  FactCheckOutlined,
   ReviewsOutlined,
   LocalOfferOutlined,
   WifiTetheringOutlined,
@@ -35,11 +38,9 @@ import {
   StreamOutlined,
   SourceOutlined,
   SubjectOutlined,
-  TipsAndUpdatesOutlined,
   BiotechOutlined,
   MapOutlined,
   RouterOutlined,
-  PowerSettingsNewOutlined,
   TaskAltOutlined,
   CasesOutlined,
   SettingsOutlined,
@@ -61,12 +62,15 @@ import {
   Launch,
   LaptopAccount,
   ArchiveOutline,
-  Brain,
+  BriefcaseEyeOutline,
+  BriefcaseSearchOutline,
+  BriefcaseRemoveOutline,
+  BriefcaseEditOutline,
 } from 'mdi-material-ui';
 import { itemColor } from '../utils/Colors';
 
 const iconSelector = (type, variant, fontSize, color, isReversed) => {
-  let style = {};
+  let style;
   switch (variant) {
     case 'inline':
       style = {
@@ -87,8 +91,18 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
   }
 
   switch (type) {
+    case 'unauthorized':
+      return <ReportProblemOutlined style={style} fontSize={fontSize} role="img" />;
+    case 'global':
+      return <PublicOutlined style={style} fontSize={fontSize} role="img" />;
+    case 'Trigger':
+      return <CampaignOutlined style={style} fontSize={fontSize} role="img" />;
     case 'admin':
-      return <ManageAccountsOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <ManageAccountsOutlined style={style} fontSize={fontSize} role="img" />
+      );
+    case 'search':
+      return <BiotechOutlined style={style} fontSize={fontSize} role="img" />;
     case 'login':
       return <LoginOutlined style={style} fontSize={fontSize} role="img" />;
     case 'logout':
@@ -96,23 +110,40 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
     case 'Vocabulary':
       return <ShortTextOutlined style={style} fontSize={fontSize} role="img" />;
     case 'RetentionRule':
-      return <LayersClearOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <LayersClearOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'StreamCollection':
       return <StreamOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Settings':
       return <SettingsOutlined style={style} fontSize={fontSize} role="img" />;
     case 'TaxiiCollection':
-      return <DatabaseExportOutline style={style} fontSize={fontSize} role="img" />;
+      return (
+        <DatabaseExportOutline style={style} fontSize={fontSize} role="img" />
+      );
     case 'Feed':
-      return <FileDelimitedOutline style={style} fontSize={fontSize} role="img" />;
-    case 'Task':
-      return <AssignmentOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <FileDelimitedOutline style={style} fontSize={fontSize} role="img" />
+      );
+    case 'BackgroundTask':
+      return (
+        <AssignmentOutlined style={style} fontSize={fontSize} role="img" />
+      );
+    case 'work':
     case 'Connector':
       return <ExtensionOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Marking-Definition':
-      return <CenterFocusStrongOutlined style={style} fontSize={fontSize} role="img"/>;
+      return (
+        <CenterFocusStrongOutlined
+          style={style}
+          fontSize={fontSize}
+          role="img"
+        />
+      );
     case 'External-Reference':
-      return <LocalOfferOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <LocalOfferOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Label':
       return <LabelOutline style={style} fontSize={fontSize} role="img" />;
     case 'Attack-Pattern':
@@ -122,15 +153,22 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
     case 'Note':
       return <SubjectOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Observed-Data':
-      return <WifiTetheringOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <WifiTetheringOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Opinion':
       return <ReviewsOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Report':
-      return <DescriptionOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <DescriptionOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Grouping':
-      return <WorkspacesOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <WorkspacesOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Course-Of-Action':
       return <ProgressWrench style={style} fontSize={fontSize} role="img" />;
+    case 'Role':
     case 'Individual':
     case 'User':
       return <PersonOutlined style={style} fontSize={fontSize} role="img" />;
@@ -140,7 +178,9 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
       return <GroupsOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Organization':
     case 'Identity':
-      return <AccountBalanceOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <AccountBalanceOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Sector':
       return <DomainOutlined style={style} fontSize={fontSize} role="img" />;
     case 'System':
@@ -152,7 +192,9 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
     case 'Intrusion-Set':
       return <DiamondOutline style={style} fontSize={fontSize} role="img" />;
     case 'City':
-      return <CityVariantOutline style={style} fontSize={fontSize} role="img" />;
+      return (
+        <CityVariantOutline style={style} fontSize={fontSize} role="img" />
+      );
     case 'Position':
     case 'Location':
       return <PlaceOutlined style={style} fontSize={fontSize} role="img" />;
@@ -175,11 +217,15 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
     case 'Incident':
       return <Fire style={style} fontSize={fontSize} role="img" />;
     case 'Channel':
-      return <SurroundSoundOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <SurroundSoundOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Event':
       return <EventOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Narrative':
-      return <SpeakerNotesOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <SpeakerNotesOutlined style={style} fontSize={fontSize} role="img" />
+      );
     case 'Language':
       return <TranslateOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Data-Source':
@@ -190,25 +236,29 @@ const iconSelector = (type, variant, fontSize, color, isReversed) => {
       return <Launch style={style} fontSize={fontSize} role="img" />;
     case 'Artifact':
       return <ArchiveOutline style={style} fontSize={fontSize} role="img" />;
+    case 'StatusTemplate':
+      return <FactCheckOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Case':
       return <WorkOutline style={style} fontSize={fontSize} role="img" />;
     case 'Case-Incident':
-      return <BiotechOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <BriefcaseEyeOutline style={style} fontSize={fontSize} role="img" />
+      );
     case 'Case-Template':
       return <CasesOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Feedback':
-      return <TipsAndUpdatesOutlined style={style} fontSize={fontSize} role="img" />;
+      return (
+        <BriefcaseEditOutline style={style} fontSize={fontSize} role="img" />
+      );
     case 'Case-Rfi':
-      return <Brain style={style} fontSize={fontSize} role="img" />;
+      return (
+        <BriefcaseSearchOutline style={style} fontSize={fontSize} role="img" />
+      );
     case 'Case-Rft':
       return (
-        <PowerSettingsNewOutlined
-          style={style}
-          fontSize={fontSize}
-          role="img"
-        />
+        <BriefcaseRemoveOutline style={style} fontSize={fontSize} role="img" />
       );
-    case 'Case-Task':
+    case 'Task':
       return <TaskAltOutlined style={style} fontSize={fontSize} role="img" />;
     case 'Stix-Cyber-Observable':
     case 'Autonomous-System':

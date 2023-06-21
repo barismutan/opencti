@@ -123,7 +123,6 @@ const initConnectorManager = () => {
   let scheduler;
   return {
     start: () => {
-      logApp.info('[OPENCTI-MODULE] Running connector manager');
       scheduler = setIntervalAsync(async () => {
         await connectorHandler();
       }, SCHEDULE_TIME);
@@ -136,6 +135,7 @@ const initConnectorManager = () => {
       };
     },
     shutdown: async () => {
+      logApp.info('[OPENCTI-MODULE] Stopping connector manager');
       if (scheduler) {
         return clearIntervalAsync(scheduler);
       }

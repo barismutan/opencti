@@ -14,13 +14,13 @@ import {
   timeSeriesEntities,
   updateAttribute
 } from '../database/middleware';
-import { internalLoadById, listEntities, storeLoadById } from '../database/middleware-loader';
+import { listEntities, storeLoadById } from '../database/middleware-loader';
 import { BUS_TOPICS, logApp } from '../config/conf';
 import { elCount } from '../database/engine';
 import { isNotEmptyField, READ_INDEX_STIX_CYBER_OBSERVABLES } from '../database/utils';
 import { workToExportFile } from './work';
 import { addIndicator } from './indicator';
-import { FunctionalError, UnsupportedError } from '../config/errors';
+import { FunctionalError } from '../config/errors';
 import { createStixPattern } from '../python/pythonBridge';
 import { checkObservableSyntax, STIX_PATTERN_TYPE } from '../utils/syntax';
 import { upload } from '../database/file-storage';
@@ -316,26 +316,11 @@ export const stixCyberObservablesExportAsk = async (context, user, args) => {
   );
   return works.map((w) => workToExportFile(w));
 };
-export const stixCyberObservableExportAsk = async (context, user, args) => {
-  const { format, exportType, stixCyberObservableId = null, maxMarkingDefinition = null } = args;
-  const entity = stixCyberObservableId
-    ? await storeLoadById(context, user, stixCyberObservableId, ABSTRACT_STIX_CYBER_OBSERVABLE)
-    : null;
+export const stixCyberObservableExportAsk = async (context, user, stixCyberObservableId, args) => {
+  const { format, exportType, maxMarkingDefinition = null } = args;
+  const entity = await storeLoadById(context, user, stixCyberObservableId, ABSTRACT_STIX_CYBER_OBSERVABLE);
   const works = await askEntityExport(context, user, format, entity, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w.work));
-};
-export const stixCyberObservablesExportPush = async (context, user, file, listFilters) => {
-  const meta = { list_filters: listFilters };
-  await upload(context, user, 'export/Stix-Cyber-Observable', file, { meta });
-  return true;
-};
-export const stixCyberObservableExportPush = async (context, user, entityId, file) => {
-  const entity = await internalLoadById(context, user, entityId);
-  if (!entity) {
-    throw UnsupportedError('Cant upload a file an none existing element', { entityId });
-  }
-  await upload(context, user, `export/Stix-Cyber-Observable/${entityId}`, file, { entity });
-  return true;
 };
 // endregion
 

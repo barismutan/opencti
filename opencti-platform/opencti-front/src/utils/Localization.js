@@ -53,6 +53,8 @@ const i18n = {
         'Debe validar su autenticación de dos factores. Por favor, escriba el código generado en su aplicación.',
       'You need to activate a two-factor authentication. Please type the code generated in your application.':
         'Necesitas activar una autenticación de dos factores. Por favor, escriba el código generado en su aplicación.',
+      'When enforcing 2FA authentication, all users will be asked to enable 2FA to be able to login in the platform.':
+        'Al aplicar la autenticación 2FA, se pedirá a todos los usuarios que habiliten 2FA para poder iniciar sesión en la plataforma.',
       Search: 'Buscar',
       Active: 'Activo',
       'Last update': 'Última actualización',
@@ -212,10 +214,10 @@ const i18n = {
       'You have no subscription for the moment.':
         'No tienes ninguna suscripción por el momento.',
       'Last notes': 'Últimas notas',
-      'Latest reports written by this entity':
-        'Últimos informes escritos por esta entidad',
-      'Latest reports about this entity': 'Últimos informes sobre esta entidad',
-      'Last reports about the entity': 'Últimos informes sobre esta entidad',
+      'Latest containers authored by this entity':
+        'Últimos contenedores creados por esta entidad',
+      'Latest containers about the object':
+        'Últimos contenedores sobre el objeto',
       'Last observables': 'Últimos observables',
       'observable(s)': 'observable(s)',
       'Last modified entities': 'Últimas entidades modificadas',
@@ -254,13 +256,20 @@ const i18n = {
       'Enforce references': 'Hacer cumplir las referencias',
       'Create external reference at upload':
         'Crear referencia externa al cargar',
+      'Hide in the platform': 'Esconderse en la plataforma',
       'This configuration enables the requirement of a reference message on an entity creation or modification.':
         'Esta configuración habilita el requerimiento de un mensaje de referencia en la creación o modificación de una entidad.',
       'This configuration enables an entity to automatically construct an external reference from the uploaded file.':
         'Esta configuración permite que una entidad construya automáticamente una referencia externa a partir del archivo cargado.',
+      // Attributes
+      Mandatory: 'Obligatoria',
+      Attribute: 'Atributo',
+      Attributes: 'Atributos',
       'Mandatory attributes': 'Atributos obligatorios',
       'Default mandatory attributes': 'Atributos obligatorios predeterminados',
       'Additional mandatory attributes': 'Atributos obligatorios adicionales',
+      Scale: 'Intervalo',
+      String: 'Cadena de carácteres',
       'Make this stream public and available to anyone':
         'Haz que esta transmisión sea pública y esté disponible para todos.',
       'Public stream': 'Transmisión pública',
@@ -395,8 +404,9 @@ const i18n = {
       'Update a subscription': 'Actualizar una suscripción',
       'Create a synchronizer': 'Crear un sincronizador',
       'Update a synchronizer': 'Actualizar un sincronizador',
-      'Create a case incident': 'Crear un incidente de caso',
-      'Update a case incident': 'Actualizar un incidente de caso',
+      'Create an incident response': 'Crear una respuesta a incidentes',
+      'Update an incident response': 'Actualizar la respuesta a un incidente',
+      'Origin of the Case': 'Origen del Caso',
       'Create a feedback': 'Crear un comentario',
       'Update a feedback': 'Actualizar un comentario',
       'Submit a feedback': 'Enviar un comentario',
@@ -420,6 +430,10 @@ const i18n = {
       'Create a task': 'Crear una tarea',
       'Update a task': 'Actualizar una tarea',
       'Add a task to this container': 'Agregar una tarea a este contenedor',
+      'Incident response': 'Respuesta al incidente',
+      'Requests for information': 'Solicitudes de información',
+      'Requests for takedown': 'Solicitudes de eliminación',
+      Feedbacks: 'Comentarios',
       Tasks: 'Tareas',
       takedown_types: 'tipos derribados',
       information_types: 'tipos de información',
@@ -655,8 +669,12 @@ const i18n = {
       Labels: 'Etiquetas',
       Label: 'Etiqueta',
       Security: 'Seguridad',
+      Customization: 'Personalización',
+      Taxonomies: 'Taxonomías',
+      // Workflow
       Workflows: 'Flujos de trabajo',
       Workflow: 'Flujo de trabajo',
+      'Workflow status': 'Estado del flujo de trabajo',
       'Data curation': 'Curación de datos',
       'Tools versions': 'Versiones de las herramientas',
       'Tool version': 'Versión de la herramienta',
@@ -814,7 +832,7 @@ const i18n = {
       'entity_Case-Incident': 'Respuesta al incidente',
       'entity_Case-Rfi': 'Solicitud de información',
       'entity_Case-Rft': 'Solicitud de eliminación',
-      'entity_Case-Task': 'Tareas',
+      entity_Task: 'Tareas',
       entity_Arsenal: 'Arsenal',
       entity_Entities: 'Entidades',
       entity_Techniques: 'Técnicas',
@@ -1106,6 +1124,7 @@ const i18n = {
       'Auto new markings': 'Autorización de nuevos marcados',
       'Default membership': 'Pertenencia predeterminada',
       'Allowed markings': 'Marcas permitidas',
+      'Default markings': 'Marcas predeterminadas',
       Members: 'Miembros',
       'can edit': 'puede editar',
       'can view': 'puede ver',
@@ -1171,6 +1190,7 @@ const i18n = {
       'Last month': 'Último mes',
       'Last 6 months': 'Últimos 6 meses',
       'Last year': 'Último año',
+      Cases: 'Casos',
       Analysis: 'Análisis',
       Events: 'Eventos',
       Arsenal: 'Arsenal',
@@ -1190,7 +1210,6 @@ const i18n = {
       References: 'Referencias',
       'Case priority': 'Prioridad',
       'Case severity': 'Gravedad',
-      'Case Task': 'Tarea de caso',
       'No tasks has been found.': 'No se han encontrado tareas.',
       'Due Date': 'Fecha de vencimiento',
       'Apply case templates': 'Aplicar plantillas de casos',
@@ -1201,7 +1220,7 @@ const i18n = {
       'Update the case template': 'Actualizar la plantilla de caso',
       Apply: 'Aplicar',
       Unlink: 'Desconectar',
-      'Do you want to unlink this task ?': '¿Quieres desvincular esta tarea?',
+      'Do you want to unlink this task?': '¿Quieres desvincular esta tarea?',
       'Source name': 'Nombre de la fuente',
       'External ID': 'ID externo',
       'Log sources': 'Origen de los registros',
@@ -1379,6 +1398,10 @@ const i18n = {
       'No entities were found for this search.':
         'Ninguna entidad fue encontrada en esta búsqueda.',
       'No reports about this entity.': 'Ningún informe sobre esta entidad.',
+      'No Malware analysis on this observable.':
+        'Ningún análisis de malware sobre esta observable.',
+      'Malware Analyses run on this observable':
+        'Análisis de malware ejecutados en este observable',
       'API access': 'Acceso a la API',
       Example: 'Ejemplo',
       'API key': 'Clave de API',
@@ -1469,7 +1492,8 @@ const i18n = {
       Generate: 'Generar',
       'Analyst workbenches': 'Espacios de trabajo del analista',
       'Create a workbench': 'Crear un espacio de trabajo',
-      'Default value': 'Valor por defecto',
+      'Default value of : ': 'Valor por defecto de : ',
+      'Default value(s)': 'Valor(es) por defecto',
       'Add and complete': 'Agregar y completar',
       'Update and complete': 'Actualizar y completar',
       'Manage an entity': 'Administrar una entidad',
@@ -1547,9 +1571,9 @@ const i18n = {
       entity_Malware: 'Malware',
       'entity_Malware-Analysis': 'Análisis de malware',
       Product: 'Producto',
-      'Result name': 'Nombre del resultado',
+      'Report name': 'Nombre del informe',
       Result_name: 'Nombre del resultado',
-      'Malware result': 'Resultado malware',
+      Maliciousness: 'Maldad',
       Version: 'Versión',
       'Version of the product': 'Version del producto',
       'Configuration version': 'Versión de configuración',
@@ -1667,7 +1691,7 @@ const i18n = {
       'relationship_variant-of': 'variante de',
       relationship_characterizes: 'caracteriza',
       'relationship_analysis-of': 'análisis de',
-      'relationship_analysis-sco': 'análisis sco',
+      'relationship_analysis-sco': 'ha capturado',
       'relationship_static-analysis-of': 'análisis estático de',
       'relationship_dynamic-analysis-of': 'análisis dinámico de',
       relationship_impersonates: 'suplanta',
@@ -1911,12 +1935,15 @@ const i18n = {
       'suggestion_threats-indicators':
         'La acción de crear `indica` reñacopmes emtre los indicadores y la amenaza seleccionada, después añade todas las relaciones al contenedor.',
       Collapse: 'Colapso',
-      'Platform Message Configuration': 'Configuración de mensajes de la plataforma',
+      'Platform Message Configuration':
+        'Configuración de mensajes de la plataforma',
       'Platform Consent Message': 'Mensaje de consentimiento de la plataforma',
-      'Platform Consent Confirm Text': 'Texto de confirmación de consentimiento de la plataforma',
+      'Platform Consent Confirm Text':
+        'Texto de confirmación de consentimiento de la plataforma',
       'Requires acceptance to enable login form when set':
         'Requiere aceptación para habilitar el formulario de inicio de sesión cuando se establece',
-      'One line confirm label next to confirm checkbox': 'Etiqueta de confirmación de una línea junto a la casilla de verificación de confirmación',
+      'One line confirm label next to confirm checkbox':
+        'Etiqueta de confirmación de una línea junto a la casilla de verificación de confirmación',
     },
     'fr-fr': {
       // Titles
@@ -1972,6 +1999,8 @@ const i18n = {
         'Vous devez valider votre authentification à deux facteurs. Veuillez saisir le code généré dans votre application.',
       'You need to activate a two-factor authentication. Please type the code generated in your application.':
         'Vous devez activer une authentification à deux facteurs. Veuillez saisir le code généré dans votre application.',
+      'When enforcing 2FA authentication, all users will be asked to enable 2FA to be able to login in the platform.':
+        "Lors de l’application de l'authentication à deux facteurs, tous les utilisateurs seront invités à activer l'authentication à deux facteurs pour pouvoir se connecter à la plate-forme.",
       Search: 'Rechercher',
       Active: 'Actif',
       'Last update': 'Dernière mise à jour',
@@ -2156,11 +2185,10 @@ const i18n = {
       'You have no subscription for the moment.':
         "Vous n'avez aucune souscription pour le moment.",
       'Last notes': 'Dernières notes',
-      'Latest reports written by this entity':
-        'Derniers rapports écrits par cette entité',
-      'Latest reports about this entity':
-        "Derniers rapports à propos de l'élément",
-      'Last reports about the entity': "Derniers rapports à propos de l'entité",
+      'Latest containers authored by this entity':
+        'Derniers conteneurs créés par cette entité',
+      'Latest containers about the object':
+        "Derniers conteneurs à propos de l'object",
       'Last observables': 'Derniers observables',
       'observable(s)': 'observable(s)',
       'Last modified entities': 'Dernières entités modifiées',
@@ -2204,10 +2232,16 @@ const i18n = {
         "Cette configuration permet l'exigence d'un message de référence sur une création ou modification d'entité.",
       'This configuration enables an entity to automatically construct an external reference from the uploaded file.':
         'Cette configuration permet à une entité de construire automatiquement une référence externe à partir du fichier téléchargé.',
+      // Attributes
+      Mandatory: 'Obligatoire',
+      Attribute: 'Attribut',
+      Attributes: 'Attributs',
       'Mandatory attributes': 'Attributs obligatoires',
       'Default mandatory attributes': 'Attributs obligatoires par défaut',
       'Additional mandatory attributes':
         'Attributs obligatoires supplémentaires',
+      Scale: 'Intervalle',
+      String: 'Chaîne de caractére',
       'Make this stream public and available to anyone':
         'Rendre ce stream public et accessible à tous',
       'Public stream': 'Stream public',
@@ -2332,18 +2366,19 @@ const i18n = {
       'Update a subscription': 'Modifier une souscription',
       'Create a synchronizer': 'Créer un synchroniseur',
       'Update a synchronizer': 'Modifier un synchroniseur',
-      'Create a case incident': 'Créer un incident',
-      'Update a case incident': 'Mettre à jour un incident',
+      'Create an incident response': 'Créer une réponse à incident',
+      'Update an incident response': 'Mettre à jour une réponse à incident',
+      'Origin of the Case': "Origine de l'affaire",
       'Create a feedback': 'Créer un commentaire',
       'Update a feedback': 'Mettre à jour un commentaire',
       'Submit a feedback': 'Soumettre un commentaire',
-      'Do you want to delete this case incident ?':
-        "Voulez-vous supprimer ce cas d'incident ?",
+      'Do you want to delete this incident response?':
+        'Voulez-vous supprimer cette réponse à incident ?',
       'Do you want to delete this feedback ?':
         'Voulez-vous supprimer ce commentaire ?',
-      'Do you want to delete this request for information case ?':
+      'Do you want to delete this request for request for information?':
         "Voulez-vous supprimer ce dossier de demande d'information ?",
-      'Do you want to delete this request for takedown case ?':
+      'Do you want to delete this request for request for takedown?':
         'Voulez-vous supprimer ce dossier de demande de retrait ?',
       'Create a request for information': "Créer une demande d'informations",
       'Update a request for information':
@@ -2357,7 +2392,10 @@ const i18n = {
       'Create a task': 'Créer une tâche',
       'Update a task': 'Mettre à jour une tâche',
       'Add a task to this container': 'Ajouter une tâche à ce conteneur',
-      Tasks: 'Tâches',
+      'Incident response': 'Réponse aux incidents',
+      'Requests for information': "Demandes d'informations",
+      'Requests for takedown': 'Demandes de retrait',
+      Feedbacks: 'Commentaires',
       takedown_types: 'types de retraits',
       information_types: "types d'informations",
       Takedown_types: 'Types de retraits',
@@ -2590,8 +2628,12 @@ const i18n = {
       Labels: 'Labels',
       Label: 'Label',
       Security: 'Sécurité',
+      Customization: 'Personnalisation',
+      Taxonomies: 'Taxonomies',
+      // Workflow
       Workflows: 'Flux de travail',
       Workflow: 'Flux de travail',
+      'Workflow status': 'État du flux de travail',
       'Data curation': 'Curation des données',
       'Tools versions': 'Versions des outils',
       'Tool version': "Version de l'outil",
@@ -2744,7 +2786,7 @@ const i18n = {
       'entity_Case-Rfi': "Demande d'information",
       'entity_Case-Rft': 'Demande de retrait',
       'entity_Case-Incident': 'Réponse aux incidents',
-      'entity_Case-Task': 'Tâches',
+      entity_Task: 'Tâches',
       entity_Arsenal: 'Arsenal',
       entity_Entities: 'Entité',
       entity_Techniques: 'Techniques',
@@ -3036,6 +3078,7 @@ const i18n = {
       'Auto new markings': 'Autorisation pour les nouveaux marquages',
       'Default membership': 'Adhésion par défaut',
       'Allowed markings': 'Marquages autorisés',
+      'Default markings': 'Marquages par défaut',
       Members: 'Membres',
       'can edit': 'peut modifier',
       'can view': 'peut voir',
@@ -3102,6 +3145,7 @@ const i18n = {
       'Last year': 'Dernière année',
       Analysis: 'Analyses',
       Events: 'Evénements',
+      Cases: 'Cas',
       Arsenal: 'Arsenal',
       Evidences: '',
       Pattern: 'Motif',
@@ -3119,13 +3163,14 @@ const i18n = {
       References: 'Références',
       'Case priority': 'Priorité',
       'Case severity': 'Sévérité',
-      'Case Task': 'Tâche de cas',
+      Task: 'Tâche',
       'Due Date': "Date d'échéance",
-      'Apply case templates': 'Appliquer des modèles de cas',
-      'Create a case template': 'Créer un nouveau modèle de cas',
-      'Apply a new case template': 'Appliquer un nouveau modèle de cas',
+      'Apply case templates': 'Appliquer des modèles de case',
+      'Case templates': 'Template de case',
+      'Create a case template': 'Créer un nouveau modèle de case',
+      'Apply a new case template': 'Appliquer un nouveau modèle de case',
       'Default case templates': 'Modèles de cas par défaut',
-      'Update the case template': 'Modifier le modèle de cas',
+      'Update the case template': 'Modifier le modèle de case',
       Apply: 'Appliquer',
       Unlink: 'Dissocier',
       'Do you want to unlink this task ?':
@@ -3169,6 +3214,7 @@ const i18n = {
       'Request For Takedown Date': 'Date de la demande de Retrait',
       'Information type': "Type d'informations",
       'Takedown type': 'Type de retrait',
+      Tasks: 'Tâches',
       Ticks: 'Marqueurs',
       Likelihood: 'Probabilité',
       'Relation type': 'Type de relation',
@@ -3305,6 +3351,10 @@ const i18n = {
         "Aucune entité n'a été trouvée pour cette recherche.",
       'No reports about this entity.':
         'Aucun rapport à propos de cette entité.',
+      'No Malware analysis on this observable.':
+        'Aucune analyse de code malveillant sur cet observable.',
+      'Malware Analyses run on this observable':
+        'Analyses de codes malveillants effectuées à partir de cet observable',
       'API access': "Accès à l'API",
       Example: 'Exemple',
       'API key': "Clé d'API",
@@ -3395,7 +3445,8 @@ const i18n = {
       Generate: 'Générer',
       'Analyst workbenches': 'Espaces de travail analyste',
       'Create a workbench': 'Créer un espace de travail',
-      'Default value': 'Valeur par défaut',
+      'Default value of : ': 'Valeur par défaut de : ',
+      'Default value(s)': 'Valeur(s) par défaut',
       'Add and complete': 'Ajouter et compléter',
       'Update and complete': 'Modifier et compléter',
       'Manage an entity': 'Gérer une entité',
@@ -3492,11 +3543,11 @@ const i18n = {
       entity_Region: 'Région',
       entity_Position: 'Position',
       entity_Malware: 'Code malveillant',
-      'entity_Malware-Analysis': 'Analyse de code malveillant',
+      'entity_Malware-Analysis': 'Analyse de code',
       Product: 'Produit',
-      'Result name': 'Nom du résultat',
+      'Report name': 'Nom du rapport',
       Result_name: 'Nom du résultat',
-      'Malware result': 'Résultat du code malveillant',
+      Maliciousness: 'Niveau de malveillance',
       Version: 'Version',
       'Version of the product': 'Version du produit',
       'Configuration version': 'Version de la configuration',
@@ -3613,7 +3664,7 @@ const i18n = {
       'relationship_variant-of': 'variante de',
       relationship_characterizes: 'caractérise',
       'relationship_analysis-of': 'analyse de',
-      'relationship_analysis-sco': 'analyse sco',
+      'relationship_analysis-sco': 'a capturé',
       'relationship_static-analysis-of': 'analyse statique de',
       'relationship_dynamic-analysis-of': 'analyse dynamique de',
       relationship_impersonates: 'se fait passer pour',
@@ -3816,7 +3867,7 @@ const i18n = {
       GRAPHQL_API: 'API GraphQL',
       EXPIRATION_SCHEDULER: "Planificateur d'expiration",
       TASK_MANAGER: 'Manager des tâches',
-      ACTIVITY_MANAGER: 'Manager d\'activité',
+      ACTIVITY_MANAGER: "Manager d'activité",
       RULE_ENGINE: 'Moteur de règles',
       SYNC_MANAGER: 'Manager de synchronisation',
       SUBSCRIPTION_MANAGER: 'Manager des souscriptions',
@@ -3837,7 +3888,7 @@ const i18n = {
       neutral: 'neutre',
       agree: 'approuve',
       'Automatic references at file upload':
-        'Références automatiques lors du téléchargement du fichier',
+        'Références auto sur upload du fichier',
       'suggestion_threats-indicators':
         'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
       'suggestion_threats-arsenal':
@@ -3845,12 +3896,15 @@ const i18n = {
       'suggestion_threats-targets':
         'Create `targets` relationships between the selected threat and victim objects (countries, sectors, etc.), then add all relations to the container.',
       Collapse: 'Réduire',
-      'Platform Message Configuration': 'Configuration des messages de la plate-forme',
+      'Platform Message Configuration':
+        'Configuration des messages de la plate-forme',
       'Platform Consent Message': 'Message de consentement de la plateforme',
-      'Platform Consent Confirm Text': 'Texte de confirmation du consentement de la plateforme',
+      'Platform Consent Confirm Text':
+        'Texte de confirmation du consentement de la plateforme',
       'Requires acceptance to enable login form when set':
         "Nécessite une acceptation pour activer le formulaire de connexion lorsqu'il est défini",
-      'One line confirm label next to confirm checkbox': 'Texte monoligne de confirmation à côté de la case à cocher de confirmation',
+      'One line confirm label next to confirm checkbox':
+        'Texte monoligne de confirmation à côté de la case à cocher de confirmation',
     },
     'ja-jp': {
       // Titles
@@ -3904,6 +3958,8 @@ const i18n = {
         '二要素認証を検証する必要があります。アプリケーションで生成されたコードを入力してください。',
       'You need to activate a two-factor authentication. Please type the code generated in your application.':
         '二要素認証を有効にする必要があります。アプリケーションで生成されたコードを入力してください。',
+      'When enforcing 2FA authentication, all users will be asked to enable 2FA to be able to login in the platform.':
+        '2要素認証を強制する場合、すべてのユーザーは、プラットフォームにログインできるように2要素認証を有効にするように求められます。',
       Search: '検索',
       Active: 'アクティブ',
       'Last update': '最終更新',
@@ -4050,8 +4106,8 @@ const i18n = {
         'このエンティティによって作成された最新のレポート',
       'Latest reports about this entity':
         'このエンティティに関連する最新のレポート',
-      'Last reports about the entity':
-        'このエンティティに関連する最新のレポート',
+      'Latest containers about the object':
+        'オブジェクトに関する最後のコンテナ',
       'Last observables': '最新の観測結果',
       'observable(s)': '観測結果',
       'Last modified entities': '最後に変更されたエンティティ',
@@ -4088,13 +4144,20 @@ const i18n = {
         'この構成により、プラットフォーム全体で特定のエンティティ タイプが非表示になりました。',
       'Enforce references': '参照を強制する',
       'Create external reference at upload': 'アップロード時に外部参照を作成',
+      'Hide in the platform': 'プラットフォームに隠れる',
       'This configuration enables the requirement of a reference message on an entity creation or modification.':
         'この構成により、エンティティの作成または変更に関する参照メッセージの要件が有効になります。',
       'This configuration enables an entity to automatically construct an external reference from the uploaded file.':
         'この構成により、エンティティはアップロードされたファイルから外部参照を自動的に構築できます。',
+      // Attributes
+      Mandatory: '必須',
+      Attribute: '属性',
+      Attributes: '属性',
       'Mandatory attributes': '必須属性',
       'Default mandatory attributes': 'デフォルトの必須属性',
       'Additional mandatory attributes': '追加の必須属性',
+      Scale: '間隔',
+      String: '文字列',
       'Make this stream public and available to anyone':
         'このストリームを公開して誰でも利用できるようにする',
       'Public stream': '公開ストリーム',
@@ -4226,8 +4289,9 @@ const i18n = {
       'Update a subscription': 'サブスクリプションを更新',
       'Create a synchronizer': '同期処理を作成',
       'Update a synchronizer': '同期処理を更新',
-      'Create a case incident': 'ケース インシデントの作成',
-      'Update a case incident': 'ケース インシデントの更新',
+      'Create an incident response': 'ケース インシデントの作成',
+      'Update an incident response': 'ケース インシデントの更新',
+      'Origin of the Case': '事件の発端',
       'Create a feedback': 'フィードバックを作成する',
       'Update a feedback': 'フィードバックを更新する',
       'Submit a feedback': 'フィードバックを送信する',
@@ -4249,6 +4313,10 @@ const i18n = {
       'Create a task': 'タスクを作成する',
       'Update a task': 'タスクを更新する',
       'Add a task to this container': 'このコンテナにタスクを追加',
+      'Incident response': 'インシデント対応',
+      'Requests for information': '情報提供のリクエスト',
+      'Requests for takedown': '削除のリクエスト',
+      Feedbacks: 'フィードバック',
       Tasks: 'タスク',
       takedown_types: 'テイクダウンの種類',
       information_types: '情報の種類',
@@ -4480,8 +4548,12 @@ const i18n = {
       Labels: 'ラベル',
       Label: 'ラベル',
       Security: '安全',
+      Customization: 'カスタマイズ',
+      Taxonomies: 'タクソノミー',
+      // Workflow
       Workflows: 'ワークフロー',
       Workflow: 'ワークフロー',
+      'Workflow status': 'ワークフローのステータス',
       'Data curation': 'データ管理',
       'Tools versions': 'ツールバージョン',
       'Tool version': 'ツールバージョン',
@@ -4635,7 +4707,7 @@ const i18n = {
       'entity_Case-Incident': '事件',
       'entity_Case-Rfi': '情報を要求する',
       'entity_Case-Rft': '削除のリクエスト',
-      'entity_Case-Task': 'ケース タスク',
+      entity_Task: 'ケース タスク',
       entity_Arsenal: '武器庫',
       entity_Entities: 'エンティティ',
       entity_Techniques: '技術',
@@ -4922,6 +4994,7 @@ const i18n = {
       'Auto new markings': '新しいマーキングの自動化',
       'Default membership': '既定のメンバーシップ',
       'Allowed markings': '許可されるマーキング',
+      'Default markings': 'デフォルトのマーキング',
       Members: 'メンバ',
       'can edit': '編集することができます',
       'can view': '見ることができます',
@@ -4987,6 +5060,7 @@ const i18n = {
       'Last year': '過去1年間',
       Analysis: '分析',
       Events: 'イベント',
+      Cases: '事例',
       Arsenal: '武器庫',
       Evidences: 'エビデンス',
       Pattern: 'パターン',
@@ -5004,7 +5078,6 @@ const i18n = {
       References: '参考文献',
       'Case priority': '优先事项',
       'Case severity': '严重程度',
-      'Case Task': 'ケース タスク',
       'Due Date': '期日',
       'Apply case templates': 'ケーステンプレートを適用する',
       'Create a case template': '新しいケーステンプレートを作成する',
@@ -5191,6 +5264,10 @@ const i18n = {
         'エンティティは見つかりませんでした。',
       'No reports about this entity.':
         'このエンティティに関するレポートはありません。',
+      'No Malware analysis on this observable.':
+        'この観測点では、マルウェアの解析は行われていません。',
+      'Malware Analyses run on this observable':
+        'この観測値で実行されるマルウェア分析',
       'API access': 'APIアクセス',
       Example: '例',
       'API key': 'APIキー',
@@ -5278,7 +5355,8 @@ const i18n = {
       Generate: '生成',
       'Analyst workbenches': 'アナリストのワークスペース',
       'Create a workbench': 'ワークスペースを作成する',
-      'Default value': 'デフォルト値',
+      'Default value of : ': 'のデフォルト値 : ',
+      'Default value(s)': 'デフォルト値',
       'Add and complete': '追加して完成',
       'Update and complete': '更新して完了',
       'Manage an entity': 'エンティティを管理する',
@@ -5354,6 +5432,8 @@ const i18n = {
       entity_Region: '地域',
       entity_Position: '位置',
       entity_Malware: 'マルウェア',
+      Maliciousness: '悪意がある',
+      'entity_Malware-Analysis': 'マルウェア分析',
       'entity_Threat-Actor': '脅威アクター',
       entity_Tool: 'ツール',
       entity_Channel: 'チャネル',
@@ -5695,8 +5775,10 @@ const i18n = {
       'Platform Message Configuration': 'プラットフォームメッセージの構成',
       'Platform Consent Message': 'プラットフォーム同意メッセージ',
       'Platform Consent Confirm Text': 'プラットフォーム同意確認テキスト',
-      'Requires acceptance to enable login form when set': '設定時にログインフォームを有効にするには同意が必要です',
-      'One line confirm label next to confirm checkbox': '確認チェックボックスの横にある 1 行の確認ラベル',
+      'Requires acceptance to enable login form when set':
+        '設定時にログインフォームを有効にするには同意が必要です',
+      'One line confirm label next to confirm checkbox':
+        '確認チェックボックスの横にある 1 行の確認ラベル',
     },
     'zh-cn': {
       // Titles
@@ -5744,6 +5826,8 @@ const i18n = {
         '您需要验证您的双因素身份验证。请输入在您的应用程序中生成的代码。',
       'You need to activate a two-factor authentication. Please type the code generated in your application.':
         '您需要激活双因素身份验证。请输入在您的应用程序中生成的代码。',
+      'When enforcing 2FA authentication, all users will be asked to enable 2FA to be able to login in the platform.':
+        '強制執行雙因素身份驗證時，將要求所有使用者啟用雙因素身份驗證才能登錄平臺。',
       Search: '搜索',
       Active: '活跃',
       'Last update': '上次更新',
@@ -5864,9 +5948,8 @@ const i18n = {
       Disable: '禁用',
       Rescan: '重新扫描',
       'Last notes': '最后注释',
-      'Latest reports written by this entity': '该实体编写的最新报告',
-      'Latest reports about this entity': '关于该实体的最新报告',
-      'Last reports about the entity': '关于该实体的最后报告',
+      'Latest containers authored by this entity': '该实体编写的最新报告',
+      'Latest containers about the object': '关于对象的最后一个容器',
       'Last observables': '最后的可观测数据',
       'observable(s)': '可观测数据',
       'Last modified entities': '最后修改的实体',
@@ -5903,13 +5986,20 @@ const i18n = {
         '此配置隐藏了整个平台的特定实体类型。',
       'Enforce references': '执行引用',
       'Create external reference at upload': '上传时创建外部参考',
+      'Hide in the platform': '隐藏在平台中',
       'This configuration enables the requirement of a reference message on an entity creation or modification.':
         '此配置启用了对实体创建或修改的参考消息的要求。',
       'This configuration enables an entity to automatically construct an external reference from the uploaded file.':
         '此配置使实体能够从上传的文件自动构建外部引用。',
+      // Attributes
+      Mandatory: '强制的',
+      Attribute: '属性',
+      Attributes: '属性',
       'Mandatory attributes': '必須属性',
       'Default mandatory attributes': '默认强制属性',
       'Additional mandatory attributes': '额外的强制属性',
+      Scale: '间隔',
+      String: '字符串',
       'Make this stream public and available to anyone':
         '将此流公开并提供给任何人',
       'Public stream': '公共流',
@@ -6026,8 +6116,9 @@ const i18n = {
       'Update a subscription': '更新一个订阅',
       'Create a synchronizer': '创建一个同步器',
       'Update a synchronizer': '更新一个同步器',
-      'Create a case incident': '创建个案事件',
-      'Update a case incident': '更新案例事件',
+      'Create an incident response': '创建个案事件',
+      'Update an incident response': '更新案例事件',
+      'Origin of the Case': '案源',
       'Create a feedback': '创建反馈',
       'Update a feedback': '更新一个反馈',
       'Submit a feedback': '提交反馈',
@@ -6047,6 +6138,10 @@ const i18n = {
       'Create a task': '创建任务',
       'Update a task': '更新任务',
       'Add a task to this container': '向此容器添加任务',
+      'Incident response': '事件响应',
+      'Requests for information': '索取资料',
+      'Requests for takedown': '删除请求',
+      Feedbacks: '反馈',
       Tasks: '任务',
       takedown_types: '删除类型',
       information_types: '信息类型',
@@ -6262,8 +6357,12 @@ const i18n = {
       Labels: '标签',
       Label: '标签',
       Security: '安全',
+      Customization: '客制化',
+      Taxonomies: '分类法',
+      // Workflow
       Workflows: '工作流程',
       Workflow: '工作流程',
+      'Workflow status': '工作流程状态',
       'Data curation': '数据管理',
       'Tools versions': '工具版本',
       'Tool version': '工具版本',
@@ -6402,7 +6501,7 @@ const i18n = {
       'entity_Case-Incident': '事件',
       'entity_Case-Rfi': '索取资料',
       'entity_Case-Rft': '要求删除',
-      'entity_Case-Task': '个案任务',
+      entity_Task: '个案任务',
       entity_Arsenal: '武器库',
       entity_Entities: '实体',
       entity_Techniques: '技術',
@@ -6685,6 +6784,7 @@ const i18n = {
       'Auto new markings': '新標記的自動化',
       'Default membership': '默認成員資格',
       'Allowed markings': '允許的標記',
+      'Default markings': '默认标记',
       Members: '成员',
       'can edit': '可以編輯',
       'can view': '可以查看',
@@ -6750,6 +6850,7 @@ const i18n = {
       'Last year': '最近1年',
       Analysis: '分析',
       Events: '事件',
+      Cases: '案例',
       Arsenal: '武器库',
       Evidences: '证据',
       Pattern: '模式',
@@ -6767,7 +6868,6 @@ const i18n = {
       References: '引用',
       'Case priority': '優先順位',
       'Case severity': '重大度',
-      'Case Task': '个案任务',
       'Due Date': '到期日',
       'Apply case templates': '应用案例模板',
       'Create a case template': '創建新案例模板',
@@ -6948,6 +7048,9 @@ const i18n = {
       '30 days': '30天',
       'No entities were found for this search.': '未找到此搜索的实体。',
       'No reports about this entity.': '没有关于此实体的报告。',
+      'No Malware analysis on this observable.':
+        '没有对这个可观察到的恶意软件进行分析。',
+      'Malware Analyses run on this observable': '对该观察点进行的恶意软件分析',
       'API access': 'API访问',
       Example: '示例',
       'API key': 'API密钥',
@@ -7027,7 +7130,8 @@ const i18n = {
       Status: '状态',
       'Analyst workbenches': '分析师工作区',
       'Create a workbench': '创建工作区',
-      'Default value': '默认值',
+      'Default value of : ': '默认值 : ',
+      'Default value(s)': '默认值',
       'Add and complete': '添加并完成',
       'Update and complete': '更新并完成',
       'Manage an entity': '管理实体',
@@ -7103,6 +7207,7 @@ const i18n = {
       entity_Region: '区域',
       entity_Position: '位置',
       entity_Malware: '恶意软件',
+      Maliciousness: '恶意行为',
       'entity_Threat-Actor': '威胁源',
       entity_Tool: '攻击工具',
       entity_Channel: '渠道',
@@ -7441,8 +7546,10 @@ const i18n = {
       'Platform Message Configuration': '平台消息配置',
       'Platform Consent Message': '我已阅读并遵守以上声明',
       'Platform Consent Confirm Text': '平台同意確認文本',
-      'Requires acceptance to enable login form when set': '設置後需要接受才能啟用登錄表單',
-      'One line confirm label next to confirm checkbox': '確認複選框旁邊的一行確認標籤',
+      'Requires acceptance to enable login form when set':
+        '設置後需要接受才能啟用登錄表單',
+      'One line confirm label next to confirm checkbox':
+        '確認複選框旁邊的一行確認標籤',
     },
     'en-us': {
       gt: 'Greater than',
@@ -7460,7 +7567,7 @@ const i18n = {
       'entity_Case-Incident': 'Incident response',
       'entity_Case-Rfi': 'Request for information',
       'entity_Case-Rft': 'Request for takedown',
-      'entity_Case-Task': 'Tasks',
+      entity_Task: 'Tasks',
       entity_Arsenal: 'Arsenal',
       entity_Entities: 'Entities',
       entity_Techniques: 'Techniques',
@@ -7607,7 +7714,7 @@ const i18n = {
       'relationship_variant-of': 'variant of',
       relationship_characterizes: 'characterizes',
       'relationship_analysis-of': 'analysis of',
-      'relationship_analysis-sco': 'analysis sco',
+      'relationship_analysis-sco': 'has captured',
       'relationship_static-analysis-of': 'static analysis of',
       'relationship_dynamic-analysis-of': 'dynamic analysis of',
       relationship_impersonates: 'impersonates',
@@ -7819,11 +7926,11 @@ const i18n = {
       NOTIFICATION_MANAGER: 'Notification generation manager',
       HISTORY_MANAGER: 'History manager',
       'suggestion_threats-indicators':
-          'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
+        'Create `indicates` relationships between indicators and the selected threat, then add all relations to the container.',
       'suggestion_threats-arsenal':
-          'Create `uses` relationships between the selected threat and arsenal objects (TTPs, tools, channels, etc.), then add all relations to the container.',
+        'Create `uses` relationships between the selected threat and arsenal objects (TTPs, tools, channels, etc.), then add all relations to the container.',
       'suggestion_threats-targets':
-          'Create `targets` relationships between the selected threat and victim objects (countries, sectors, etc.), then add all relations to the container.',
+        'Create `targets` relationships between the selected threat and victim objects (countries, sectors, etc.), then add all relations to the container.',
     },
   },
 };

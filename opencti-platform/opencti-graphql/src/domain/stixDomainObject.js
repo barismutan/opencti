@@ -10,9 +10,8 @@ import {
   timeSeriesEntities,
   updateAttribute,
 } from '../database/middleware';
-import { internalLoadById, listEntities, storeLoadById } from '../database/middleware-loader';
+import { listEntities, storeLoadById } from '../database/middleware-loader';
 import { elCount, elFindByIds } from '../database/engine';
-import { upload } from '../database/file-storage';
 import { workToExportFile } from './work';
 import { FunctionalError, UnsupportedError } from '../config/errors';
 import {
@@ -126,21 +125,11 @@ export const stixDomainObjectsExportAsk = async (context, user, args) => {
   const works = await askListExport(context, user, format, type, selectedIds, listParams, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w));
 };
-export const stixDomainObjectExportAsk = async (context, user, args) => {
-  const { format, stixDomainObjectId = null, exportType = null, maxMarkingDefinition = null } = args;
-  const entity = stixDomainObjectId ? await storeLoadById(context, user, stixDomainObjectId, ABSTRACT_STIX_DOMAIN_OBJECT) : null;
+export const stixDomainObjectExportAsk = async (context, user, stixDomainObjectId, args) => {
+  const { format, exportType = null, maxMarkingDefinition = null } = args;
+  const entity = await storeLoadById(context, user, stixDomainObjectId, ABSTRACT_STIX_DOMAIN_OBJECT);
   const works = await askEntityExport(context, user, format, entity, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w));
-};
-export const stixDomainObjectsExportPush = async (context, user, type, file, listFilters) => {
-  const meta = { list_filters: listFilters };
-  await upload(context, user, `export/${type}`, file, { meta });
-  return true;
-};
-export const stixDomainObjectExportPush = async (context, user, entityId, file) => {
-  const entity = await internalLoadById(context, user, entityId);
-  await upload(context, user, `export/${entity.entity_type}/${entityId}`, file, { entity });
-  return true;
 };
 // endregion
 

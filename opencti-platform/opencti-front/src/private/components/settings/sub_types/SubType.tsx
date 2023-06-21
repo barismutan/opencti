@@ -1,4 +1,3 @@
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React, { useMemo } from 'react';
 import Paper from '@mui/material/Paper';
@@ -8,12 +7,14 @@ import { GraphQLSubscriptionConfig } from 'relay-runtime';
 import { useFormatter } from '../../../../components/i18n';
 import ItemStatusTemplate from '../../../../components/ItemStatusTemplate';
 import SubTypeStatusPopover from './SubTypeWorkflowPopover';
-import EntitySetting from './EntitySetting';
+import EntitySettingSettings from './entitySetting/EntitySettingSettings';
 import { SubType_subType$key } from './__generated__/SubType_subType.graphql';
-import EntitySettingAttributesConfiguration from './EntitySettingAttributesConfiguration';
-import EntitySettingAttributesConfigurationScale from './EntitySettingAttributesConfigurationScale';
 import { SubTypeEntitySettingSubscription } from './__generated__/SubTypeEntitySettingSubscription.graphql';
+import EntitySettingAttributes from './entitySetting/EntitySettingAttributes';
 import CustomizationMenu from '../CustomizationMenu';
+import SearchInput from '../../../../components/SearchInput';
+import { usePaginationLocalStorage } from '../../../../utils/hooks/useLocalStorage';
+import { DataSourcesLinesPaginationQuery$variables } from '../../techniques/data_sources/__generated__/DataSourcesLinesPaginationQuery.graphql';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -30,24 +31,25 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const entitySettingSubscription = graphql`
+const entitySettingSubscription = graphql`
   subscription SubTypeEntitySettingSubscription($id: ID!) {
     entitySetting(id: $id) {
-      ...EntitySetting_entitySetting
+      id
     }
   }
 `;
 
 // -- GRAPHQL - ENTITY --
 
-export const subTypeFragment = graphql`
+const subTypeFragment = graphql`
   fragment SubType_subType on SubType {
     id
     label
     workflowEnabled
     settings {
       id
-      ...EntitySetting_entitySetting
+      ...EntitySettingSettings_entitySetting
+      ...EntitySettingAttributes_entitySetting
     }
     statuses {
       edges {
@@ -69,7 +71,6 @@ const SubType = ({ data }: { data: SubType_subType$key }) => {
   const classes = useStyles();
   const subType = useFragment(subTypeFragment, data);
   const statuses = (subType.statuses?.edges ?? []).map((edge) => edge.node);
-
   const subTypeSettingsId = subType.settings?.id;
   if (subTypeSettingsId) {
     const config = useMemo<
@@ -83,7 +84,11 @@ const SubType = ({ data }: { data: SubType_subType$key }) => {
     );
     useSubscription(config);
   }
-
+  const { viewStorage, helpers } = usePaginationLocalStorage<DataSourcesLinesPaginationQuery$variables>(
+    `view-${subType.id}-attributes`,
+    { searchTerm: '' },
+  );
+  const { searchTerm } = viewStorage;
   return (
     <div className={classes.container}>
       <CustomizationMenu />
@@ -92,34 +97,43 @@ const SubType = ({ data }: { data: SubType_subType$key }) => {
           {t(`entity_${subType.label}`)}
         </Typography>
       </div>
-      <Grid container={true} spacing={3} style={{ marginBottom: 20 }}>
-        <Grid item={true} xs={6}>
-          <div style={{ height: '100%' }}>
-            <Typography variant="h4" gutterBottom={true}>
-              {t('Configuration')}
-            </Typography>
-            <Paper classes={{ root: classes.paper }} variant="outlined">
-              <EntitySetting entitySettingsData={subType.settings} />
-              <div style={{ marginTop: 10 }}>
-                <Typography variant="h3" gutterBottom={true}>
-                  {t('Workflow')}
-                  <SubTypeStatusPopover subTypeId={subType.id} />
-                </Typography>
-              </div>
-              <ItemStatusTemplate
-                statuses={statuses}
-                disabled={!subType.workflowEnabled}
-              />
-            </Paper>
-          </div>
-        </Grid>
-        <EntitySettingAttributesConfiguration
-          entitySettingsData={subType.settings}
+      <Typography variant="h4" gutterBottom={true}>
+        {t('Configuration')}
+      </Typography>
+      <Paper
+        classes={{ root: classes.paper }}
+        variant="outlined"
+        style={{ marginBottom: 30 }}
+      >
+        <EntitySettingSettings entitySettingsData={subType.settings} />
+        <div style={{ marginTop: 10 }}>
+          <Typography variant="h3" gutterBottom={true}>
+            {t('Workflow')}
+            <SubTypeStatusPopover subTypeId={subType.id} />
+          </Typography>
+        </div>
+        <ItemStatusTemplate
+          statuses={statuses}
+          disabled={!subType.workflowEnabled}
         />
-        <EntitySettingAttributesConfigurationScale
-          entitySettingsData={subType.settings}
+      </Paper>
+      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+        {t('Attributes')}
+      </Typography>
+      <div style={{ float: 'right', marginTop: -12 }}>
+        <SearchInput
+          variant="thin"
+          onSubmit={helpers.handleSearch}
+          keyword={searchTerm}
         />
-      </Grid>
+      </div>
+      <div className="clearfix" />
+      <Paper classes={{ root: classes.paper }} variant="outlined" style={{ paddingTop: 5 }}>
+        <EntitySettingAttributes
+          entitySettingsData={subType.settings}
+          searchTerm={searchTerm}
+        ></EntitySettingAttributes>
+      </Paper>
     </div>
   );
 };

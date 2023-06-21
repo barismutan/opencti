@@ -35,7 +35,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: 5,
+    paddingRight: 10,
   },
   goIcon: {
     position: 'absolute',
@@ -219,7 +219,7 @@ const StixCoreObjectOrStixCoreRelationshipContainerLineFragment = createFragment
             name
             created
           }
-          ... on CaseTask {
+          ... on Task {
             name
           }
           createdBy {

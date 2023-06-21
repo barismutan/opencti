@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: 5,
+    paddingRight: 10,
   },
   itemIconDisabled: {
     color: theme.palette.grey[700],
@@ -293,7 +293,7 @@ export const ContainerStixDomainObjectLine = createFragmentContainer(
         ... on Case {
           name
         }
-        ... on CaseTask {
+        ... on Task {
           name
         }
         objectLabel {

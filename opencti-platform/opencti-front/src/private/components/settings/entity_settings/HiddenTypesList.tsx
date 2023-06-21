@@ -7,7 +7,7 @@ import { Field } from 'formik';
 import { graphql, useMutation } from 'react-relay';
 import { useFormatter } from '../../../../components/i18n';
 import SelectField from '../../../../components/SelectField';
-import { entitySettingsPatch } from '../sub_types/EntitySetting';
+import { entitySettingPatch } from '../sub_types/entitySetting/EntitySettingSettings';
 import useEntitySettings from '../../../../utils/hooks/useEntitySettings';
 import { RoleEditionOverview_role$data } from '../roles/__generated__/RoleEditionOverview_role.graphql';
 import { SETTINGS_SETACCESSES } from '../../../../utils/hooks/useGranted';
@@ -32,7 +32,7 @@ export const hiddenTypesListRoleMutationFieldPatch = graphql`
 
 export const groups = new Map<string, string[]>([
   ['Analysis', ['Report', 'Grouping', 'Note', 'Opinion', 'Malware-Analysis']],
-  ['Cases', ['Case-Incident', 'Feedback', 'Case-Rfi', 'Case-Rft']],
+  ['Cases', ['Case-Incident', 'Feedback', 'Case-Rfi', 'Case-Rft', 'Task']],
   ['Events', ['Incident', 'Observed-Data']],
   ['Observations', ['Indicator', 'Infrastructure']],
   ['Threats', ['Threat-Actor', 'Intrusion-Set', 'Campaign']],
@@ -123,7 +123,7 @@ const HiddenTypesList: FunctionComponent<HiddenTypesListProps> = ({ role }) => {
     ...initialEntitySettingsEntityType,
   ]);
 
-  const mutation = role ? hiddenTypesListRoleMutationFieldPatch : entitySettingsPatch;
+  const mutation = role ? hiddenTypesListRoleMutationFieldPatch : entitySettingPatch;
   const [commit] = useMutation(mutation);
 
   const handleChangeGlobal = (values: string[]) => {

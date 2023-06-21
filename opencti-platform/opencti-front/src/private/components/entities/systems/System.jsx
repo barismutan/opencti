@@ -8,7 +8,6 @@ import inject18n from '../../../../components/i18n';
 import SystemDetails from './SystemDetails';
 import SystemEdition from './SystemEdition';
 import SystemPopover from './SystemPopover';
-import StixCoreObjectOrStixCoreRelationshipLastReports from '../../analysis/reports/StixCoreObjectOrStixCoreRelationshipLastReports';
 import StixDomainObjectHeader from '../../common/stix_domain_objects/StixDomainObjectHeader';
 import Security from '../../../../utils/Security';
 import { KNOWLEDGE_KNUPDATE } from '../../../../utils/hooks/useGranted';
@@ -17,6 +16,7 @@ import StixDomainObjectOverview from '../../common/stix_domain_objects/StixDomai
 import StixCoreObjectExternalReferences from '../../analysis/external_references/StixCoreObjectExternalReferences';
 import StixCoreObjectLatestHistory from '../../common/stix_core_objects/StixCoreObjectLatestHistory';
 import SimpleStixObjectOrStixRelationshipStixCoreRelationships from '../../common/stix_core_relationships/SimpleStixObjectOrStixRelationshipStixCoreRelationships';
+import StixCoreObjectOrStixRelationshipLastContainers from '../../common/containers/StixCoreObjectOrStixRelationshipLastContainers';
 
 const styles = () => ({
   container: {
@@ -31,7 +31,7 @@ class SystemComponent extends Component {
   render() {
     const { classes, system, viewAs, onViewAs } = this.props;
     const lastReportsProps = viewAs === 'knowledge'
-      ? { stixCoreObjectOrStixCoreRelationshipId: system.id }
+      ? { stixCoreObjectOrStixRelationshipId: system.id }
       : { authorId: system.id };
     return (
       <div className={classes.container}>
@@ -55,43 +55,35 @@ class SystemComponent extends Component {
           <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
             <StixDomainObjectOverview stixDomainObject={system} />
           </Grid>
-        </Grid>
-        <Grid
-          container={true}
-          spacing={3}
-          classes={{ container: classes.gridContainer }}
-          style={{ marginTop: 25 }}
-        >
           {viewAs === 'knowledge' && (
-            <Grid item={true} xs={6}>
+            <Grid item={true} xs={6} style={{ marginTop: 30 }}>
               <SimpleStixObjectOrStixRelationshipStixCoreRelationships
                 stixObjectOrStixRelationshipId={system.id}
                 stixObjectOrStixRelationshipLink={`/dashboard/entities/systems/${system.id}/knowledge`}
               />
             </Grid>
           )}
-          <Grid item={true} xs={viewAs === 'knowledge' ? 6 : 12}>
-            <StixCoreObjectOrStixCoreRelationshipLastReports
+          <Grid
+            item={true}
+            xs={viewAs === 'knowledge' ? 6 : 12}
+            style={{ marginTop: 30 }}
+          >
+            <StixCoreObjectOrStixRelationshipLastContainers
               {...lastReportsProps}
             />
           </Grid>
-        </Grid>
-        <Grid
-          container={true}
-          spacing={3}
-          classes={{ container: classes.gridContainer }}
-          style={{ marginTop: 25 }}
-        >
-          <Grid item={true} xs={6}>
+          <Grid item={true} xs={6} style={{ marginTop: 30 }}>
             <StixCoreObjectExternalReferences stixCoreObjectId={system.id} />
           </Grid>
-          <Grid item={true} xs={6}>
+          <Grid item={true} xs={6} style={{ marginTop: 30 }}>
             <StixCoreObjectLatestHistory stixCoreObjectId={system.id} />
           </Grid>
         </Grid>
         <StixCoreObjectOrStixCoreRelationshipNotes
           stixCoreObjectOrStixCoreRelationshipId={system.id}
-          defaultMarkings={(system.objectMarking?.edges ?? []).map((edge) => edge.node)}
+          defaultMarkings={(system.objectMarking?.edges ?? []).map(
+            (edge) => edge.node,
+          )}
         />
         <Security needs={[KNOWLEDGE_KNUPDATE]}>
           <SystemEdition systemId={system.id} />

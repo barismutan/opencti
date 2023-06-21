@@ -19,7 +19,7 @@ import {
   TASK_TYPE_QUERY,
   TASK_TYPE_RULE,
   updateTask,
-} from '../domain/task';
+} from '../domain/backgroundTask';
 import conf, { booleanConf, logApp } from '../config/conf';
 import { resolveUserById } from '../domain/user';
 import {
@@ -71,7 +71,7 @@ import {
   ACTION_TYPE_UNSHARE,
   isTaskEnabledEntity,
   TASK_TYPE_LIST
-} from '../domain/task-common';
+} from '../domain/backgroundTask-common';
 
 // Task manager responsible to execute long manual tasks
 // Each API will start is task manager.
@@ -502,6 +502,7 @@ const initTaskManager = () => {
       };
     },
     shutdown: async () => {
+      logApp.info('[OPENCTI-MODULE] Stopping task manager');
       if (scheduler) {
         return clearIntervalAsync(scheduler);
       }

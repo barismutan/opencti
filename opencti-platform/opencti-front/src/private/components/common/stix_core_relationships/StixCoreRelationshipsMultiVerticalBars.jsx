@@ -59,6 +59,7 @@ const StixCoreRelationshipsMultiVerticalBars = ({
   endDate,
   dataSelection,
   parameters = {},
+  withExportPopover = false,
 }) => {
   const theme = useTheme();
   const classes = useStyles();
@@ -92,6 +93,8 @@ const StixCoreRelationshipsMultiVerticalBars = ({
         toTypes: dataSelectionToTypes,
         field: dataSelectionDateAttribute,
         filters: finalFilters,
+        dynamicFrom: convertFilters(selection.dynamicFrom),
+        dynamicTo: convertFilters(selection.dynamicTo),
       };
     });
     return (
@@ -129,7 +132,7 @@ const StixCoreRelationshipsMultiVerticalBars = ({
                 type="bar"
                 width="100%"
                 height="100%"
-                withExportPopover={true}
+                withExportPopover={withExportPopover}
               />
             );
           }

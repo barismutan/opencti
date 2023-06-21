@@ -4,11 +4,79 @@ import type { BasicStoreObject } from '../types/store';
 
 interface BasicUserAction {
   user: AuthUser
-  status: 'success' | 'error'
-  event_type: 'login' | 'logout' | 'read' | 'upload' | 'download' | 'export' | 'admin' | 'unauthorized'
+  status?: 'success' | 'error' // nothing = success
+  event_type: 'authentication' | 'read' | 'mutation' | 'file' | 'command'
+  event_access: 'extended' | 'administration'
 }
+
+// region actions
+export interface UserSearchAction extends BasicUserAction {
+  event_type: 'command'
+  event_scope: 'search'
+  context_data: {
+    input: unknown,
+  }
+}
+export interface UserEnrichAction extends BasicUserAction {
+  event_type: 'command'
+  event_scope: 'enrich'
+  context_data: {
+    id: string
+    entity_name: string
+    entity_type: string
+    connector_id: string
+    connector_name: string
+  }
+}
+export interface UserImportAction extends BasicUserAction {
+  event_type: 'command'
+  event_scope: 'import'
+  context_data: {
+    id: string,
+    file_id: string,
+    file_mime: string,
+    file_name: string,
+    connectors: string[],
+    entity_name: string,
+    entity_type: string
+  }
+}
+export interface UserExportAction extends BasicUserAction {
+  event_type: 'command'
+  event_scope: 'export'
+  context_data: {
+    id: string
+    format: string
+    entity_name: string
+    entity_type: string
+    export_scope: 'query' | 'single' | 'selection'
+    export_type: 'simple' | 'full'
+    element_id: string // Same as id
+    max_marking: string
+    list_params?: unknown,
+    selected_ids?: string[]
+  }
+}
+// endregion
+
+// region file
+export interface UserFileAction extends BasicUserAction {
+  event_type: 'file'
+  event_scope: 'read' | 'create' | 'delete'
+  context_data: {
+    id: string
+    path: string
+    entity_name: string
+    entity_type: string
+    file_name: string
+  }
+}
+// endregion
+
+// region read / mutation
 export interface UserReadAction extends BasicUserAction {
   event_type: 'read'
+  event_scope: 'read'
   context_data: {
     id: string
     entity_name: string
@@ -16,67 +84,42 @@ export interface UserReadAction extends BasicUserAction {
   }
 }
 export interface UserForbiddenAction extends BasicUserAction {
-  event_type: 'unauthorized'
+  event_type: 'read' | 'mutation'
+  event_scope: 'unauthorized'
   context_data: {
-    path: string
+    operation: string
+    input: unknown,
   }
 }
-export interface UserDownloadAction extends BasicUserAction {
-  event_type: 'download'
-  context_data: {
-    id: string
-    path: string
-    entity_name: string
-    entity_type: string
-    file_name: string
-  }
-}
-export interface UserUploadAction extends BasicUserAction {
-  event_type: 'upload'
-  context_data: {
-    id: string
-    path: string
-    entity_name: string
-    entity_type: string
-    file_name: string
-  }
-}
-export interface UserAdminAction extends BasicUserAction {
-  event_type: 'admin'
+export interface UserModificationAction extends BasicUserAction {
+  event_type: 'mutation'
+  event_scope: 'create' | 'update' | 'delete' | 'merge'
   message: string
   context_data: {
     entity_type: string
-    operation: 'create' | 'update' | 'delete'
     input: unknown
   }
 }
+// endregion
+
+// region authentication
 export interface UserLoginAction extends BasicUserAction {
-  event_type: 'login'
+  event_type: 'authentication'
+  event_scope: 'login'
   context_data: {
     provider: string
+    username: string
   }
 }
 export interface UserLogoutAction extends BasicUserAction {
-  event_type: 'logout'
+  event_type: 'authentication'
+  event_scope: 'logout'
   context_data: undefined
 }
-export interface UserExportAction extends BasicUserAction {
-  event_type: 'export'
-  context_data: {
-    export_scope: 'query' | 'single' | 'selection'
-    export_type: 'simple' | 'full'
-    id: string
-    element_id: string // Same as id
-    entity_name: string
-    entity_type: string
-    file_name: string
-    max_marking: string
-    list_params?: unknown,
-    selected_ids?: string[],
-  }
-}
-export type UserAction = UserReadAction | UserDownloadAction | UserUploadAction | UserLoginAction |
-UserLogoutAction | UserExportAction | UserAdminAction | UserForbiddenAction;
+// endregion
+
+export type UserAction = UserReadAction | UserFileAction | UserLoginAction | UserEnrichAction | UserImportAction |
+UserLogoutAction | UserExportAction | UserModificationAction | UserForbiddenAction | UserSearchAction;
 
 export interface ActionListener {
   id: string

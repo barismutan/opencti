@@ -41,14 +41,12 @@ import {
 } from '../schema/stixMetaObject';
 import {
   buildEntityFilters,
-  internalLoadById,
   listEntities,
   listRelations,
   storeLoadById
 } from '../database/middleware-loader';
-import { askEntityExport, askListExport, exportTransformFilters } from './stix';
+import { askListExport, exportTransformFilters } from './stix';
 import { workToExportFile } from './work';
-import { upload } from '../database/file-storage';
 import { ENTITY_TYPE_CONTAINER_CASE } from '../modules/case/case-types';
 import {
   stixObjectOrRelationshipAddRefRelation,
@@ -86,18 +84,53 @@ export const stixCoreRelationshipsDistribution = async (context, user, args) => 
   }
   return distributionRelations(context, context.user, finalArgs);
 };
-export const stixCoreRelationshipsNumber = (context, user, args) => {
-  const { relationship_type = [ABSTRACT_STIX_CORE_RELATIONSHIP] } = args;
-  const numberArgs = buildEntityFilters({ ...args, types: relationship_type });
+export const stixCoreRelationshipsNumber = async (context, user, args) => {
+  const { relationship_type = [ABSTRACT_STIX_CORE_RELATIONSHIP], dynamicFrom, dynamicTo } = args;
+  let finalArgs = args;
+  if (isNotEmptyField(dynamicFrom)) {
+    const fromArgs = { connectionFormat: false, first: 500, filters: dynamicFrom };
+    const fromIds = await listEntities(context, user, [ABSTRACT_STIX_CORE_OBJECT], fromArgs)
+      .then((result) => result.map((n) => n.id));
+    if (fromIds.length > 0) {
+      finalArgs = { ...finalArgs, fromId: args.fromId ? [...fromIds, args.fromId] : fromIds };
+    }
+  }
+  if (isNotEmptyField(dynamicTo)) {
+    const toArgs = { connectionFormat: false, first: 500, filters: dynamicTo };
+    const toIds = await listEntities(context, user, [ABSTRACT_STIX_CORE_OBJECT], toArgs)
+      .then((result) => result.map((n) => n.id));
+    if (toIds.length > 0) {
+      finalArgs = { ...finalArgs, toId: args.toId ? [...toIds, args.toId] : toIds };
+    }
+  }
+  const numberArgs = buildEntityFilters({ ...finalArgs, types: relationship_type });
   const indices = args.onlyInferred ? [READ_INDEX_INFERRED_RELATIONSHIPS] : [READ_INDEX_STIX_CORE_RELATIONSHIPS, READ_INDEX_INFERRED_RELATIONSHIPS];
   return {
     count: elCount(context, user, indices, numberArgs),
     total: elCount(context, user, indices, R.dissoc('endDate', numberArgs)),
   };
 };
-export const stixCoreRelationshipsMultiTimeSeries = (context, user, args) => {
-  return Promise.all(args.timeSeriesParameters.map((timeSeriesParameter) => {
-    return { data: timeSeriesRelations(context, user, { ...args, ...timeSeriesParameter }) };
+export const stixCoreRelationshipsMultiTimeSeries = async (context, user, args) => {
+  return Promise.all(args.timeSeriesParameters.map(async (timeSeriesParameter) => {
+    const { dynamicFrom, dynamicTo } = timeSeriesParameter;
+    let finalTimeSeriesParameter = timeSeriesParameter;
+    if (isNotEmptyField(dynamicFrom)) {
+      const fromArgs = { connectionFormat: false, first: 500, filters: dynamicFrom };
+      const fromIds = await listEntities(context, user, [ABSTRACT_STIX_CORE_OBJECT], fromArgs)
+        .then((result) => result.map((n) => n.id));
+      if (fromIds.length > 0) {
+        finalTimeSeriesParameter = { ...finalTimeSeriesParameter, fromId: args.fromId ? [...fromIds, args.fromId] : fromIds };
+      }
+    }
+    if (isNotEmptyField(dynamicTo)) {
+      const toArgs = { connectionFormat: false, first: 500, filters: dynamicTo };
+      const toIds = await listEntities(context, user, [ABSTRACT_STIX_CORE_OBJECT], toArgs)
+        .then((result) => result.map((n) => n.id));
+      if (toIds.length > 0) {
+        finalTimeSeriesParameter = { ...finalTimeSeriesParameter, toId: args.toId ? [...toIds, args.toId] : toIds };
+      }
+    }
+    return { data: timeSeriesRelations(context, user, { ...args, ...finalTimeSeriesParameter }) };
   }));
 };
 // endregion
@@ -202,22 +235,6 @@ export const stixCoreRelationshipsExportAsk = async (context, user, args) => {
   const listParams = { ...initialParams, ...exportTransformFilters(finalArgsFilter, filtersOpts, ordersOpts) };
   const works = await askListExport(context, user, format, type, selectedIds, listParams, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w));
-};
-export const stixCoreRelationshipExportAsk = async (context, user, args) => {
-  const { format, stixCoreRelationshipId = null, exportType = null, maxMarkingDefinition = null } = args;
-  const entity = stixCoreRelationshipId ? await storeLoadById(context, user, stixCoreRelationshipId, ABSTRACT_STIX_CORE_RELATIONSHIP) : null;
-  const works = await askEntityExport(context, user, format, entity, exportType, maxMarkingDefinition);
-  return works.map((w) => workToExportFile(w));
-};
-export const stixCoreRelationshipsExportPush = async (context, user, type, file, listFilters) => {
-  const meta = { list_filters: listFilters };
-  await upload(context, user, `export/${type}`, file, { meta });
-  return true;
-};
-export const stixCoreRelationshipExportPush = async (context, user, entityId, file) => {
-  const entity = await internalLoadById(context, user, entityId);
-  await upload(context, user, `export/${entity.entity_type}/${entityId}`, file, { entity });
-  return true;
 };
 // endregion
 

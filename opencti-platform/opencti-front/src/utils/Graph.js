@@ -41,7 +41,7 @@ import CaseIncident from '../static/images/entities/case-incident.svg';
 import Feedback from '../static/images/entities/feedback.svg';
 import CaseRfi from '../static/images/entities/case-rfi.svg';
 import CaseRft from '../static/images/entities/case-rft.svg';
-import CaseTask from '../static/images/entities/case-task.svg';
+import Task from '../static/images/entities/task.svg';
 import Unknown from '../static/images/entities/unknown.svg';
 import StixCyberObservable from '../static/images/entities/stix-cyber-observable.svg';
 import relationship from '../static/images/entities/relationship.svg';
@@ -75,7 +75,8 @@ export const graphImages = {
   'Case-Incident': genImage(CaseIncident),
   'Case-Rfi': genImage(CaseRfi),
   'Case-Rft': genImage(CaseRft),
-  'Case-Task': genImage(CaseTask),
+  Task: genImage(Task),
+  'Malware-Analysis': genImage(MalwareAnalysis),
   Campaign: genImage(Campaign),
   Note: genImage(Note),
   'Observed-Data': genImage(ObservedData),
@@ -91,7 +92,7 @@ export const graphImages = {
   Infrastructure: genImage(Infrastructure),
   'Intrusion-Set': genImage(IntrusionSet),
   City: genImage(City),
-  AdministrativeArea: genImage(AdministrativeArea),
+  'Administrative-Area': genImage(AdministrativeArea),
   Country: genImage(Country),
   Region: genImage(Region),
   Position: genImage(Position),
@@ -156,6 +157,7 @@ export const graphLevel = {
   Indicator: 1,
   Infrastructure: 1,
   'Intrusion-Set': 1,
+  'Administrative-Area': 1,
   City: 1,
   Country: 1,
   Region: 1,
@@ -176,7 +178,7 @@ export const graphLevel = {
   'Case-Incident': 1,
   'Case-Rft': 1,
   'Case-Rfi': 1,
-  'Case-Task': 1,
+  Task: 1,
   Feedback: 1,
   Directory: 1,
   'Domain-Name': 1,
@@ -251,7 +253,7 @@ export const graphRawImages = {
   Feedback,
   'Case-Rfi': CaseRfi,
   'Case-Rft': CaseRft,
-  'Case-Task': CaseTask,
+  Task,
   Directory: StixCyberObservable,
   'Domain-Name': StixCyberObservable,
   'Email-Addr': StixCyberObservable,
@@ -1197,3 +1199,26 @@ export const parseDomain = (data) => [
     data.map((entry) => entry.value),
   ),
 ];
+
+export const pointInPolygon = (polygon, point) => {
+  // A point is in a polygon if a line from the point to infinity crosses the polygon an odd number of times
+  let odd = false;
+  // For each edge (In this case for each point of the polygon and the previous one)
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; i += 1) {
+    // If a line from the point into infinity crosses this edge
+    if (
+      polygon[i][1] > point[1] !== polygon[j][1] > point[1] // One point needs to be above, one below our y coordinate
+      // ...and the edge doesn't cross our Y corrdinate before our x coordinate (but between our x coordinate and infinity)
+      && point[0]
+        < ((polygon[j][0] - polygon[i][0]) * (point[1] - polygon[i][1]))
+          / (polygon[j][1] - polygon[i][1])
+          + polygon[i][0]
+    ) {
+      // Invert odd
+      odd = !odd;
+    }
+    j = i;
+  }
+  // If the number of crossings was odd, the point is in the polygon
+  return odd;
+};

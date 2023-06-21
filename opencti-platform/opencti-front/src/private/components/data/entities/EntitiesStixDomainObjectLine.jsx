@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    paddingRight: 5,
+    paddingRight: 10,
   },
   goIcon: {
     position: 'absolute',
@@ -229,7 +229,7 @@ export const EntitiesStixDomainObjectLine = createFragmentContainer(
           name
           description
         }
-        ... on CaseTask {
+        ... on Task {
           name
           description
         }
@@ -346,7 +346,7 @@ export const EntitiesStixDomainObjectLine = createFragmentContainer(
         ... on Case {
           name
         }
-        ... on CaseTask {
+        ... on Task {
           name
         }
         createdBy {

@@ -1,29 +1,37 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import withTheme from '@mui/styles/withTheme';
-import withStyles from '@mui/styles/withStyles';
-import IconButton from '@mui/material/IconButton';
-import {
-  ResponsiveContainer,
-  Scatter,
-  ScatterChart,
-  YAxis,
-  ZAxis,
-} from 'recharts';
 import {
   AccountBalanceOutlined,
-  AspectRatio,
+  AspectRatioOutlined,
   CenterFocusStrongOutlined,
   DateRangeOutlined,
   DeleteOutlined,
   EditOutlined,
   FilterAltOffOutlined,
   FilterListOutlined,
+  GestureOutlined,
   LinkOutlined,
   OpenWithOutlined,
   ScatterPlotOutlined,
 } from '@mui/icons-material';
+import Badge from '@mui/material/Badge';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Popover from '@mui/material/Popover';
+import Slide from '@mui/material/Slide';
+import Tooltip from '@mui/material/Tooltip';
+import withStyles from '@mui/styles/withStyles';
+import withTheme from '@mui/styles/withTheme';
 import {
   AutoFix,
   FamilyTree,
@@ -32,36 +40,29 @@ import {
   SelectionDrag,
   Video3d,
 } from 'mdi-material-ui';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import React, { Component } from 'react';
 import TimeRange from 'react-timeline-range-slider';
-import LinearProgress from '@mui/material/LinearProgress';
-import Tooltip from '@mui/material/Tooltip';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import Badge from '@mui/material/Badge';
-import Drawer from '@mui/material/Drawer';
-import Popover from '@mui/material/Popover';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import Divider from '@mui/material/Divider';
-import Slide from '@mui/material/Slide';
-import DialogContentText from '@mui/material/DialogContentText';
+import {
+  ResponsiveContainer,
+  Scatter,
+  ScatterChart,
+  YAxis,
+  ZAxis,
+} from 'recharts';
 import inject18n from '../../../../components/i18n';
-import { truncate } from '../../../../utils/String';
-import StixCoreRelationshipEdition from '../../common/stix_core_relationships/StixCoreRelationshipEdition';
-import StixDomainObjectEdition from '../../common/stix_domain_objects/StixDomainObjectEdition';
-import InvestigationAddStixCoreObjects from './InvestigationAddStixCoreObjects';
-import { dateFormat } from '../../../../utils/Time';
-import { parseDomain } from '../../../../utils/Graph';
-import StixCoreRelationshipCreation from '../../common/stix_core_relationships/StixCoreRelationshipCreation';
 import SearchInput from '../../../../components/SearchInput';
-import StixCyberObservableEdition from '../../observations/stix_cyber_observables/StixCyberObservableEdition';
+import { parseDomain } from '../../../../utils/Graph';
 import { EXPLORE_EXUPDATE } from '../../../../utils/hooks/useGranted';
 import Security from '../../../../utils/Security';
+import { truncate } from '../../../../utils/String';
+import { dateFormat } from '../../../../utils/Time';
+import StixCoreRelationshipCreation from '../../common/stix_core_relationships/StixCoreRelationshipCreation';
+import StixCoreRelationshipEdition from '../../common/stix_core_relationships/StixCoreRelationshipEdition';
+import StixDomainObjectEdition from '../../common/stix_domain_objects/StixDomainObjectEdition';
+import StixCyberObservableEdition from '../../observations/stix_cyber_observables/StixCyberObservableEdition';
+import InvestigationAddStixCoreObjects from './InvestigationAddStixCoreObjects';
 
 const styles = () => ({
   bottomNav: {
@@ -233,7 +234,9 @@ class InvestigationGraphBar extends Component {
       currentCreatedBy,
       currentMarkedBy,
       currentStixCoreObjectsTypes,
+      currentSelectRectangleModeFree,
       currentSelectModeFree,
+      selectModeFreeReady,
       handleToggle3DMode,
       handleToggleTreeMode,
       handleToggleFixedMode,
@@ -241,6 +244,7 @@ class InvestigationGraphBar extends Component {
       handleToggleMarkedBy,
       handleToggleStixCoreObjectType,
       handleZoomToFit,
+      handleToggleRectangleSelectModeFree,
       handleToggleSelectModeFree,
       stixCoreObjectsTypes,
       createdBy,
@@ -458,7 +462,7 @@ class InvestigationGraphBar extends Component {
                     onClick={handleZoomToFit.bind(this)}
                     size="large"
                   >
-                    <AspectRatio />
+                    <AspectRatioOutlined />
                   </IconButton>
                 </span>
               </Tooltip>
@@ -478,13 +482,26 @@ class InvestigationGraphBar extends Component {
               <Tooltip title={t('Free rectangle select')}>
                 <span>
                   <IconButton
-                    color={currentSelectModeFree ? 'secondary' : 'primary'}
+                    color={
+                      currentSelectRectangleModeFree ? 'secondary' : 'primary'
+                    }
                     size="large"
-                    onClick={handleToggleSelectModeFree.bind(this)}
+                    onClick={handleToggleRectangleSelectModeFree.bind(this)}
+                    disabled={currentMode3D}
                   >
                     <SelectionDrag />
                   </IconButton>
                 </span>
+              </Tooltip>
+              <Tooltip title={t('Free select')}>
+                <IconButton
+                  color={currentSelectModeFree ? 'secondary' : 'primary'}
+                  size="large"
+                  onClick={handleToggleSelectModeFree.bind(this)}
+                  disabled={!selectModeFreeReady || currentMode3D}
+                >
+                  <GestureOutlined />
+                </IconButton>
               </Tooltip>
               <Tooltip title={t('Select by entity type')}>
                 <span>
@@ -719,17 +736,19 @@ class InvestigationGraphBar extends Component {
                   ))}
                 </List>
               </Popover>
-              <Tooltip title={t('Clear all filters')}>
-                <span>
-                  <IconButton
-                    color="primary"
-                    onClick={resetAllFilters.bind(this)}
-                    size="large"
-                  >
-                    <FilterAltOffOutlined />
-                  </IconButton>
-                </span>
-              </Tooltip>
+              {resetAllFilters && (
+                <Tooltip title={t('Clear all filters')}>
+                  <span>
+                    <IconButton
+                      color="primary"
+                      onClick={resetAllFilters.bind(this)}
+                      size="large"
+                    >
+                      <FilterAltOffOutlined />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
               <Divider className={classes.divider} orientation="vertical" />
               <div style={{ margin: '9px 0 0 10px' }}>
                 <SearchInput
@@ -964,9 +983,13 @@ InvestigationGraphBar.propTypes = {
   handleToggle3DMode: PropTypes.func,
   handleToggleTreeMode: PropTypes.func,
   currentMode3D: PropTypes.bool,
+  handleToggleRectangleSelectModeFree: PropTypes.func,
   handleToggleSelectModeFree: PropTypes.func,
   currentModeTree: PropTypes.string,
   currentModeFixed: PropTypes.bool,
+  currentSelectModeFree: PropTypes.bool,
+  currentSelectRectangleModeFree: PropTypes.bool,
+  selectModeFreeReady: PropTypes.bool,
   handleToggleFixedMode: PropTypes.func,
   handleZoomToFit: PropTypes.func,
   handleToggleStixCoreObjectType: PropTypes.func,

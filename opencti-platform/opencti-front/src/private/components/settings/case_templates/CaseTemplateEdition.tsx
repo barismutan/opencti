@@ -6,8 +6,8 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import { Field, Formik } from 'formik';
 import * as R from 'ramda';
-import React, { FunctionComponent, useState } from 'react';
-import { graphql, PreloadedQuery, useMutation } from 'react-relay';
+import React, { FunctionComponent, useRef } from 'react';
+import { graphql, useMutation } from 'react-relay';
 import { RecordSourceSelectorProxy } from 'relay-runtime';
 import * as Yup from 'yup';
 import { useFormatter } from '../../../../components/i18n';
@@ -15,14 +15,11 @@ import MarkDownField from '../../../../components/MarkDownField';
 import TextField from '../../../../components/TextField';
 import { Theme } from '../../../../components/Theme';
 import { fieldSpacingContainerStyle } from '../../../../utils/field';
-import usePreloadedFragment from '../../../../utils/hooks/usePreloadedFragment';
 import { deleteNode, insertNode } from '../../../../utils/store';
 import CaseTemplateTasks from '../../common/form/CaseTemplateTasks';
 import { Option } from '../../common/form/ReferenceField';
-import { CaseTemplateEditionQuery } from './__generated__/CaseTemplateEditionQuery.graphql';
-import { CaseTemplateLine_node$key } from './__generated__/CaseTemplateLine_node.graphql';
+import { CaseTemplateLine_node$data } from './__generated__/CaseTemplateLine_node.graphql';
 import { CaseTemplateTasksLines_DataQuery$variables } from './__generated__/CaseTemplateTasksLines_DataQuery.graphql';
-import { CaseTemplateLineFragment } from './CaseTemplateLine';
 
 const useStyles = makeStyles<Theme>((theme) => ({
   drawerPaper: {
@@ -57,26 +54,16 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const caseTemplateAddTask = graphql`
   mutation CaseTemplateEditionAddTaskMutation($id: ID!, $input: StixRefRelationshipAddInput!) {
-    stixDomainObjectEdit(id: $id) {
-      relationAdd(input: $input) {
-        id
-        from {
-          ...CaseTemplateTasksLine_node
-        }
-      }
+    caseTemplateRelationAdd(id: $id, input: $input) {
+      ...CaseTemplateLine_node
     }
   }
 `;
 
 const caseTemplateDeleteTask = graphql`
   mutation CaseTemplateEditionDeleteTaskMutation($id: ID!, $toId: StixRef!) {
-    stixDomainObjectEdit(id: $id) {
-      relationDelete(
-        toId: $toId,
-        relationship_type: "object"
-      ) {
-        id
-      }
+    caseTemplateRelationDelete(id: $id, toId: $toId, relationship_type: "template-task") {
+      id
     }
   }
 `;
@@ -98,10 +85,11 @@ export const caseTemplateFieldPatch = graphql`
   }
 `;
 
-interface CaseTempateEditionProps {
-  existingTasks: Option[]
+interface CaseTemplateEditionProps {
+  caseTemplate: CaseTemplateLine_node$data
   paginationOptions: CaseTemplateTasksLines_DataQuery$variables
-  queryRef: PreloadedQuery<CaseTemplateEditionQuery>
+  openPanel: boolean
+  setOpenPanel: (status: boolean) => void
 }
 
 const caseTemplateValidation = (t: (name: string | object) => string) => Yup.object().shape({
@@ -110,68 +98,58 @@ const caseTemplateValidation = (t: (name: string | object) => string) => Yup.obj
   tasks: Yup.array(),
 });
 
-const CaseTemplateEdition: FunctionComponent<CaseTempateEditionProps> = ({
-  existingTasks,
+const CaseTemplateEdition: FunctionComponent<CaseTemplateEditionProps> = ({
+  caseTemplate,
   paginationOptions,
-  queryRef,
+  openPanel,
+  setOpenPanel,
 }) => {
   const classes = useStyles();
   const { t } = useFormatter();
-
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpenPanel(true);
+  const handleClose = () => setOpenPanel(false);
 
   const [commitAddTask] = useMutation(caseTemplateAddTask);
   const [commitDeleteTask] = useMutation(caseTemplateDeleteTask);
   const [commitFieldPatch] = useMutation(caseTemplateFieldPatch);
 
-  const caseTemplate = usePreloadedFragment<CaseTemplateEditionQuery, CaseTemplateLine_node$key>({
-    queryRef,
-    fragmentDef: CaseTemplateLineFragment,
-    queryDef: caseTemplateQuery,
-    nodePath: 'caseTemplate',
-  });
-
+  const existingTasks = useRef<Option[] | undefined>();
+  if (!existingTasks.current) {
+    existingTasks.current = caseTemplate.tasks.edges.map(({ node }) => ({ value: node.id, label: node.name }));
+  }
   const submitTaskEdition = (values: Option[]) => {
-    const added = R.difference(values, existingTasks).at(0);
-    const removed = R.difference(existingTasks, values).at(0);
+    const added = R.difference(values, (existingTasks.current ?? [])).at(0);
+    const removed = R.difference((existingTasks.current ?? []), values).at(0);
     if (added?.value) {
-      const input = {
-        toId: caseTemplate.id,
-        relationship_type: 'object',
-      };
+      const input = { toId: added.value, relationship_type: 'template-task' };
       commitAddTask({
-        variables: {
-          id: added.value,
-          input,
-        },
+        variables: { id: caseTemplate.id, input },
         updater: (store: RecordSourceSelectorProxy) => insertNode(
           store,
-          'Pagination_caseTemplate__caseTasks',
+          'Pagination_caseTemplate__taskTemplates',
           paginationOptions,
-          'stixDomainObjectEdit',
+          'caseTemplateRelationAdd',
           null,
-          'relationAdd',
+          null,
           input,
-          'from',
         ),
       });
     }
     if (removed?.value) {
       commitDeleteTask({
         variables: {
-          id: removed.value,
-          toId: caseTemplate.id,
+          id: caseTemplate.id,
+          toId: removed.value,
         },
         updater: (store: RecordSourceSelectorProxy) => deleteNode(
           store,
-          'Pagination_caseTemplate__caseTasks',
+          'Pagination_caseTemplate__taskTemplates',
           paginationOptions,
           removed.value,
         ),
       });
     }
+    existingTasks.current = values;
   };
 
   const handleSubmitField = (name: string, value: string) => {
@@ -197,7 +175,7 @@ const CaseTemplateEdition: FunctionComponent<CaseTempateEditionProps> = ({
         <Edit />
       </Fab>
       <Drawer
-        open={open}
+        open={openPanel}
         anchor="right"
         elevation={1}
         sx={{ zIndex: 1202 }}
@@ -220,9 +198,10 @@ const CaseTemplateEdition: FunctionComponent<CaseTempateEditionProps> = ({
           <Formik
             initialValues={{
               ...caseTemplate,
-              tasks: existingTasks,
+              tasks: existingTasks.current,
             }}
-            onSubmit={() => {}}
+            onSubmit={() => {
+            }}
             validationSchema={caseTemplateValidation(t)}
           >
             {({ values: currentValues, setFieldValue }) => (

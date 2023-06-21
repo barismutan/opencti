@@ -38,10 +38,10 @@ class SearchStixCoreObjectsLines extends Component {
         loadMore={relay.loadMore.bind(this)}
         hasMore={relay.hasMore.bind(this)}
         isLoading={relay.isLoading.bind(this)}
-        dataList={pathOr([], ['stixCoreObjects', 'edges'], this.props.data)}
+        dataList={pathOr([], ['globalSearch', 'edges'], this.props.data)}
         globalCount={pathOr(
           nbOfRowsToLoad,
-          ['stixCoreObjects', 'pageInfo', 'globalCount'],
+          ['globalSearch', 'pageInfo', 'globalCount'],
           this.props.data,
         )}
         LineComponent={<SearchStixCoreObjectLine />}
@@ -333,7 +333,7 @@ export default createPaginationContainer(
         orderMode: { type: "OrderingMode", defaultValue: asc }
         filters: { type: "[StixCoreObjectsFiltering]" }
       ) {
-        stixCoreObjects(
+        globalSearch(
           types: $types
           search: $search
           first: $count
@@ -341,7 +341,7 @@ export default createPaginationContainer(
           orderBy: $orderBy
           orderMode: $orderMode
           filters: $filters
-        ) @connection(key: "Pagination_stixCoreObjects") {
+        ) @connection(key: "Pagination_globalSearch") {
           edges {
             node {
               id

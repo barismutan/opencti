@@ -377,7 +377,7 @@ export const buildEntityFilters = <T extends BasicStoreCommon>(args: EntityFilte
   }
   // endregion
   // Override some special filters
-  builtFilters.types = [...(types ?? []), ...entityTypes, ...relationshipTypes];
+  builtFilters.types = R.uniq([...(types ?? []), ...entityTypes, ...relationshipTypes]);
   builtFilters.filters = customFilters;
   return builtFilters;
 };
@@ -434,7 +434,7 @@ export const internalFindByIds = async <T extends BasicStoreObject>(
   context: AuthContext,
   user: AuthUser,
   ids: string[],
-  args?: { type?: string, baseData?: boolean, baseFields?: string[] } & Record<string, string | string[] | boolean>
+  args?: { type?: string | string[], baseData?: boolean, baseFields?: string[] } & Record<string, string | string[] | boolean>
 ) => {
   return await elFindByIds(context, user, ids, args) as unknown as T[];
 };
@@ -443,7 +443,7 @@ export const internalLoadById = async <T extends BasicStoreObject>(
   context: AuthContext,
   user: AuthUser,
   id: string | undefined,
-  opts?: { type?: string },
+  opts?: { type?: string, baseData?: boolean },
 ): Promise<T> => {
   // TODO Remove when all Typescript
   return await elLoadById(context, user, id, opts) as unknown as T;
@@ -455,9 +455,11 @@ export const storeLoadById = async <T extends BasicStoreObject>(context: AuthCon
   }
   const data = await internalLoadById<T>(context, user, id, { type });
   if (data) {
-    await publishUserAction({ user,
+    await publishUserAction({
+      user,
       event_type: 'read',
-      status: 'success',
+      event_access: 'extended',
+      event_scope: 'read',
       context_data: {
         id,
         entity_name: extractEntityRepresentative(data),

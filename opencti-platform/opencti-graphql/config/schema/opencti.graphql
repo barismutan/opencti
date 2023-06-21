@@ -268,6 +268,8 @@ input StixCoreRelationshipsTimeSeriesParameters {
   search: String
   filters: [StixCoreRelationshipsFiltering]
   filterMode: FilterMode
+  dynamicFrom: [StixCoreObjectsFiltering]
+  dynamicTo: [StixCoreObjectsFiltering]
 }
 type Distribution {
   label: String!
@@ -371,6 +373,7 @@ type Log {
   id: ID!
   entity_type: String
   event_type: String!
+  event_status: String!
   timestamp: DateTime!
   user_id: String!
   user: Creator
@@ -385,7 +388,7 @@ enum AttributesOrdering {
 }
 type AttributeConnection {
   pageInfo: PageInfo!
-  edges: [AttributeEdge]
+  edges: [AttributeEdge!]!
 }
 type AttributeEdge {
   cursor: String!
@@ -752,18 +755,18 @@ type FileConnection {
   edges: [FileEdge]
 }
 
-############## Task
-enum TaskType {
+############## BackgroundTask
+enum BackgroundTaskType {
   QUERY
   LIST
   RULE
 }
-type TaskError {
+type BackgroundTaskError {
   id: ID!
   timestamp: DateTime
   message: String
 }
-enum TaskActionType {
+enum BackgroundTaskActionType {
   DELETE
   ADD
   REMOVE
@@ -775,127 +778,127 @@ enum TaskActionType {
   SHARE
   UNSHARE
 }
-enum TaskContextType {
+enum BackgroundTaskContextType {
   ATTRIBUTE
   RELATION
   REVERSED_RELATION
 }
-enum TasksOrdering {
+enum BackgroundTasksOrdering {
   id
   type
   completed
   created_at
   last_execution_date
 }
-enum TasksFilter {
+enum BackgroundTasksFilter {
   type
   initiator
   completed
 }
-input TasksFiltering {
-  key: [TasksFilter!]!
+input BackgroundTasksFiltering {
+  key: [BackgroundTasksFilter!]!
   values: [String]
   operator: String
   filterMode: FilterMode
 }
-type TaskContext {
+type BackgroundTaskContext {
   field: String
-  type: TaskContextType
+  type: BackgroundTaskContextType
   values: [String]!
 }
-type TaskAction {
-  type: TaskActionType
-  context: TaskContext
+type BackgroundTaskAction {
+  type: BackgroundTaskActionType
+  context: BackgroundTaskContext
 }
 
-interface Task {
+interface BackgroundTask {
   id: ID!
-  type: TaskType
+  type: BackgroundTaskType
   initiator: Creator
-  actions: [TaskAction]
+  actions: [BackgroundTaskAction]
   created_at: DateTime
   last_execution_date: DateTime
   completed: Boolean
   task_expected_number: Int
   task_processed_number: Int
-  errors: [TaskError]
+  errors: [BackgroundTaskError]
 }
 
-type RuleTask implements Task {
+type RuleTask implements BackgroundTask {
   id: ID!
-  type: TaskType
+  type: BackgroundTaskType
   initiator: Creator
-  actions: [TaskAction]
+  actions: [BackgroundTaskAction]
   created_at: DateTime
   last_execution_date: DateTime
   completed: Boolean
   task_expected_number: Int
   task_processed_number: Int
-  errors: [TaskError]
+  errors: [BackgroundTaskError]
   # RuleTask
   rule: ID!
   enable: Boolean
 }
 
-type ListTask implements Task {
+type ListTask implements BackgroundTask {
   id: ID!
-  type: TaskType
+  type: BackgroundTaskType
   initiator: Creator
-  actions: [TaskAction]
+  actions: [BackgroundTaskAction]
   created_at: DateTime
   last_execution_date: DateTime
   completed: Boolean
   task_expected_number: Int
   task_processed_number: Int
-  errors: [TaskError]
+  errors: [BackgroundTaskError]
   # ListTask
   task_ids: [ID!]
 }
 
-type QueryTask implements Task {
+type QueryTask implements BackgroundTask {
   id: ID!
-  type: TaskType
+  type: BackgroundTaskType
   initiator: Creator
-  actions: [TaskAction]
+  actions: [BackgroundTaskAction]
   created_at: DateTime
   last_execution_date: DateTime
   completed: Boolean
   task_expected_number: Int
   task_processed_number: Int
-  errors: [TaskError]
+  errors: [BackgroundTaskError]
   # QueryTask
   task_filters: String!
   task_search: String
 }
 
-type TaskConnectionEdge {
+type BackgroundTaskConnectionEdge {
   cursor: String!
-  node: Task!
+  node: BackgroundTask!
 }
 
-type TaskConnection {
+type BackgroundTaskConnection {
   pageInfo: PageInfo!
-  edges: [TaskConnectionEdge]
+  edges: [BackgroundTaskConnectionEdge]
 }
 
-input TaskContextInput {
+input BackgroundTaskContextInput {
   field: String
-  type: TaskContextType
+  type: BackgroundTaskContextType
   values: [String]!
 }
-input TaskActionInput {
-  type: TaskActionType!
-  context: TaskContextInput
+input BackgroundTaskActionInput {
+  type: BackgroundTaskActionType!
+  context: BackgroundTaskContextInput
 }
 input ListTaskAddInput {
   ids: [ID!]
-  actions: [TaskActionInput]!
+  actions: [BackgroundTaskActionInput]!
 }
 input QueryTaskAddInput {
   filters: String!
   search: String
   excluded_ids: [ID]
-  actions: [TaskActionInput]!
+  actions: [BackgroundTaskActionInput]!
 }
 
 input RetentionRuleAddInput {
@@ -1033,6 +1036,14 @@ type GroupEdge {
   cursor: String!
   node: Group!
 }
+input DefaultMarkingInput {
+  entity_type: String!
+  values: [String!]
+}
+type DefaultMarking {
+  entity_type: String
+  values: [MarkingDefinition!]
+}
 type Group implements InternalObject & BasicObject {
   id: ID! # internal_id
   standard_id: String!
@@ -1050,7 +1061,8 @@ type Group implements InternalObject & BasicObject {
     orderBy: RolesOrdering
     orderMode: OrderingMode
   ): [Role]
-  allowed_marking: [MarkingDefinition]
+  allowed_marking: [MarkingDefinition!]
+  default_marking: [DefaultMarking!]
   # Technical
   editContext: [EditUserContext!]
 }
@@ -1206,6 +1218,7 @@ type MeUser implements BasicObject & InternalObject {
   capabilities: [Capability!]!
   default_hidden_types: [String]!
   allowed_marking: [MarkingDefinition!]
+  default_marking: [DefaultMarking!]
   otp_mandatory: Boolean
 }
 type SessionDetail {
@@ -1745,6 +1758,7 @@ enum StixCoreObjectsFilter {
   entity_type
   revoked
   relationship_type
+  elementId
   aliases
   x_opencti_aliases
   x_mitre_id
@@ -3846,7 +3860,7 @@ input IdentityAddInput {
   x_opencti_stix_ids: [StixId]
   type: IdentityType!
   name: String!
-  description: String!
+  description: String
   contact_information: String
   roles: [String]
   x_opencti_aliases: [String]
@@ -10795,6 +10809,7 @@ union StixObjectOrStixRelationshipOrCreator =
   | StixCoreRelationship
   | StixSightingRelationship
   | StixRefRelationship
+  | Task
   | DataComponent
   | DataSource
   | CaseIncident
@@ -10802,7 +10817,6 @@ union StixObjectOrStixRelationshipOrCreator =
   | CaseRft
   | Feedback
   | CaseTemplate
-  | CaseTask
   | EntitySetting
   | Creator
   | Workspace
@@ -10880,7 +10894,7 @@ union StixObjectOrStixRelationship =
   | CaseRft
   | Feedback
   | CaseTemplate
-  | CaseTask
+  | Task
   | EntitySetting
   | Workspace
 union StixCoreObjectOrStixCoreRelationship =
@@ -10952,7 +10966,7 @@ union StixCoreObjectOrStixCoreRelationship =
   | CaseRft
   | Feedback
   | CaseTemplate
-  | CaseTask
+  | Task
   | EntitySetting
   | Workspace
 
@@ -11014,8 +11028,8 @@ interface StixRelationship {
   # StixRelationship
   x_opencti_stix_ids: [StixId]
   is_inferred: Boolean!
-  from: StixObjectOrStixRelationship
-  to: StixObjectOrStixRelationship
+  from: StixObjectOrStixRelationshipOrCreator
+  to: StixObjectOrStixRelationshipOrCreator
   x_opencti_inferences: [Inference]
   spec_version: String!
   created: DateTime
@@ -11104,10 +11118,10 @@ type StixCoreRelationship implements BasicRelationship & StixRelationship {
   # StixRelationship
   x_opencti_stix_ids: [StixId]
   is_inferred: Boolean!
-  from: StixObjectOrStixRelationship
+  from: StixObjectOrStixRelationshipOrCreator
   fromId: String!
   fromType: String!
-  to: StixObjectOrStixRelationship
+  to: StixObjectOrStixRelationshipOrCreator
   toId: String!
   toType: String!
   x_opencti_inferences: [Inference]
@@ -11253,10 +11267,10 @@ type StixSightingRelationship implements BasicRelationship & StixRelationship {
   # StixRelationship
   x_opencti_stix_ids: [StixId]
   is_inferred: Boolean!
-  from: StixObjectOrStixRelationship
+  from: StixObjectOrStixRelationshipOrCreator
   fromId: String!
   fromType: String!
-  to: StixObjectOrStixRelationship
+  to: StixObjectOrStixRelationshipOrCreator
   toId: String!
   toType: String!
   x_opencti_inferences: [Inference]
@@ -11360,8 +11374,8 @@ type StixRefRelationship implements BasicRelationship & StixRelationship {
   # StixRelationship
   x_opencti_stix_ids: [StixId]
   is_inferred: Boolean!
-  from: StixObjectOrStixRelationship
-  to: StixObjectOrStixRelationship
+  from: StixObjectOrStixRelationshipOrCreator
+  to: StixObjectOrStixRelationshipOrCreator
   x_opencti_inferences: [Inference]
   spec_version: String!
   created: DateTime
@@ -11385,7 +11399,7 @@ type StixRefRelationship implements BasicRelationship & StixRelationship {
 }
 
 type DefinitionRefRelationship {
-  entity: StixObjectOrStixRelationship!
+  entity: StixObjectOrStixRelationshipOrCreator!
   from: [String!]
   to: [String!]
 }
@@ -11567,16 +11581,16 @@ type Query {
     filterMode: FilterMode
     search: String
   ): StatusConnection @auth
-  task(id: String!): Task @auth(for: [KNOWLEDGE])
-  tasks(
+  backgroundTask(id: String!): BackgroundTask @auth(for: [KNOWLEDGE])
+  backgroundTasks(
     first: Int
     after: ID
-    orderBy: TasksOrdering
+    orderBy: BackgroundTasksOrdering
     orderMode: OrderingMode
-    filters: [TasksFiltering]
+    filters: [BackgroundTasksFiltering]
     filterMode: FilterMode
     search: String
-  ): TaskConnection @auth(for: [KNOWLEDGE])
+  ): BackgroundTaskConnection @auth(for: [KNOWLEDGE])
   rule(id: String!): Rule @auth(for: [KNOWLEDGE])
   rules: [Rule] @auth(for: [KNOWLEDGE])
   ruleManagerInfo: RuleManager @auth(for: [SETTINGS])
@@ -11650,6 +11664,16 @@ type Query {
     search: String
     relationship_type: [String]
     elementId: String
+  ): StixCoreObjectConnection @auth(for: [KNOWLEDGE])
+  globalSearch(
+    first: Int
+    after: ID
+    search: String
+    types: [String]
+    orderBy: StixCoreObjectsOrdering
+    orderMode: OrderingMode
+    filters: [StixCoreObjectsFiltering]
+    filterMode: FilterMode
   ): StixCoreObjectConnection @auth(for: [KNOWLEDGE])
   stixCoreObjectsExportFiles(first: Int, type: String!): FileConnection @auth(for: [KNOWLEDGE_KNGETEXPORT])
   stixCoreObjectsTimeSeries(
@@ -12328,6 +12352,8 @@ type Query {
     search: String
     filters: [StixCoreRelationshipsFiltering]
     filterMode: FilterMode
+    dynamicFrom: [StixCoreObjectsFiltering]
+    dynamicTo: [StixCoreObjectsFiltering]
   ): [TimeSeries] @auth(for: [KNOWLEDGE, EXPLORE])
   stixCoreRelationshipsMultiTimeSeries(
     operation: StatsOperation!
@@ -12380,6 +12406,8 @@ type Query {
     search: String
     filters: [StixCoreRelationshipsFiltering]
     filterMode: FilterMode
+    dynamicFrom: [StixCoreObjectsFiltering]
+    dynamicTo: [StixCoreObjectsFiltering]
   ): Number @auth(for: [KNOWLEDGE, EXPLORE])
   stixCoreRelationshipsExportFiles(first: Int, type: String!): FileConnection @auth(for: [KNOWLEDGE_KNGETEXPORT])
 
@@ -12566,6 +12594,7 @@ type GroupEditMutations {
   contextClean: Group
   relationAdd(input: InternalRelationshipAddInput!): InternalRelationship
   relationDelete(fromId: StixRef, toId: StixRef, relationship_type: String!): Group
+  editDefaultMarking(input: DefaultMarkingInput!): Group
 }
 type UserEditMutations {
   delete: ID
@@ -12993,9 +13022,9 @@ type Mutation {
   workDelete(connectorId: String!): Boolean
 
   ### TASK
-  deleteTask(id: ID!): ID! @auth(for: [KNOWLEDGE_KNUPDATE])
-  listTaskAdd(input: ListTaskAddInput!): Task! @auth(for: [KNOWLEDGE_KNUPDATE])
-  queryTaskAdd(input: QueryTaskAddInput!): Task! @auth(for: [KNOWLEDGE_KNUPDATE])
+  deleteBackgroundTask(id: ID!): ID! @auth(for: [KNOWLEDGE_KNUPDATE])
+  listTaskAdd(input: ListTaskAddInput!): BackgroundTask! @auth(for: [KNOWLEDGE_KNUPDATE])
+  queryTaskAdd(input: QueryTaskAddInput!): BackgroundTask! @auth(for: [KNOWLEDGE_KNUPDATE])
 
   ### RETENTION RULE
   retentionRuleAdd(input: RetentionRuleAddInput!): RetentionRule! @auth(for: [SETTINGS])

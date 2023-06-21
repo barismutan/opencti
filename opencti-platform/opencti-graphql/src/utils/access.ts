@@ -44,6 +44,7 @@ export const SYSTEM_USER: AuthUser = {
   organizations: [],
   allowed_organizations: [],
   allowed_marking: [],
+  default_marking: [],
   all_marking: [],
   api_token: '',
 };
@@ -62,6 +63,7 @@ export const RETENTION_MANAGER_USER: AuthUser = {
   organizations: [],
   allowed_organizations: [],
   allowed_marking: [],
+  default_marking: [],
   all_marking: [],
   api_token: '',
 };
@@ -80,9 +82,12 @@ export const RULE_MANAGER_USER: AuthUser = {
   organizations: [],
   allowed_organizations: [],
   allowed_marking: [],
+  default_marking: [],
   all_marking: [],
   api_token: '',
 };
+
+export interface AuthorizedMember { id: string, access_right: string }
 
 class TracingContext {
   ctx: Context | undefined;
@@ -238,7 +243,7 @@ export const computeUserMemberAccessIds = (user: AuthUser) => {
 
 // user access methods
 export const getUserAccessRight = (user: AuthUser, element: any) => {
-  if (isBypassUser(user) || !element.authorized_members) { // no restricted user access on element
+  if (isUserHasCapability(user, SETTINGS_SET_ACCESSES) || !element.authorized_members) { // no restricted user access on element
     return MEMBER_ACCESS_RIGHT_ADMIN;
   }
   const accessMembers = [...element.authorized_members];

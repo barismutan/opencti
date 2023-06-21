@@ -55,7 +55,7 @@ export const itemColor = (type, dark = false, reversed = false) => {
         return '#107a6e';
       }
       return '#44a49d';
-    case 'Case-Task':
+    case 'Task':
       if (dark) {
         return '#303f9f';
       }
@@ -173,9 +173,9 @@ export const itemColor = (type, dark = false, reversed = false) => {
       return '#ff9800';
     case 'Malware-Analysis':
       if (dark) {
-        return '#e65100aa';
+        return '#00838f';
       }
-      return '#ff9800aa';
+      return '#00bcd4';
     case 'Threat-Actor':
       if (dark) {
         return '#880e4f';

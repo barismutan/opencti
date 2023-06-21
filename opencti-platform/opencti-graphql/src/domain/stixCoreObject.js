@@ -34,7 +34,6 @@ import {
   ENTITY_TYPE_CONTAINER_NOTE,
   ENTITY_TYPE_CONTAINER_OBSERVED_DATA,
   ENTITY_TYPE_CONTAINER_OPINION,
-  ENTITY_TYPE_CONTAINER_REPORT,
 } from '../schema/stixDomainObject';
 import {
   ENTITY_TYPE_EXTERNAL_REFERENCE,
@@ -50,7 +49,13 @@ import { deleteFile, loadFile, storeFileConverter, upload } from '../database/fi
 import { elCount, elUpdateElement } from '../database/engine';
 import { generateStandardId, getInstanceIds } from '../schema/identifier';
 import { askEntityExport, askListExport, exportTransformFilters } from './stix';
-import { isEmptyField, isNotEmptyField, READ_ENTITIES_INDICES, READ_INDEX_INFERRED_ENTITIES } from '../database/utils';
+import {
+  extractEntityRepresentative,
+  isEmptyField,
+  isNotEmptyField,
+  READ_ENTITIES_INDICES,
+  READ_INDEX_INFERRED_ENTITIES
+} from '../database/utils';
 import { RELATION_RELATED_TO } from '../schema/stixCoreRelationship';
 import { ENTITY_TYPE_CONTAINER_CASE } from '../modules/case/case-types';
 import { getEntitySettingFromCache } from '../modules/entitySetting/entitySetting-utils';
@@ -59,6 +64,7 @@ import {
   stixObjectOrRelationshipAddRefRelations,
   stixObjectOrRelationshipDeleteRefRelation
 } from './stixObjectOrStixRelationship';
+import { buildContextDataForFile, publishUserAction } from '../listener/UserActionListener';
 
 export const findAll = async (context, user, args) => {
   let types = [];
@@ -84,6 +90,15 @@ export const findAll = async (context, user, args) => {
       filters = [...filters, { key: buildRefRelationKey('*'), values: [args.elementId] }];
     }
   }
+  if (args.globalSearch) {
+    await publishUserAction({
+      user,
+      event_type: 'command',
+      event_scope: 'search',
+      event_access: 'extended',
+      context_data: { input: args }
+    });
+  }
   return listEntities(context, user, types, { ...R.omit(['elementId', 'relationship_type'], args), filters });
 };
 
@@ -93,10 +108,6 @@ export const findById = async (context, user, stixCoreObjectId) => {
 
 export const batchCreatedBy = async (context, user, stixCoreObjectIds) => {
   return batchLoadThroughGetTo(context, user, stixCoreObjectIds, RELATION_CREATED_BY, ENTITY_TYPE_IDENTITY);
-};
-
-export const batchReports = async (context, user, stixCoreObjectIds, args = {}) => {
-  return batchListThroughGetFrom(context, user, stixCoreObjectIds, RELATION_OBJECT, ENTITY_TYPE_CONTAINER_REPORT, args);
 };
 
 export const batchCases = async (context, user, stixCoreObjectIds, args = {}) => {
@@ -159,6 +170,10 @@ export const stixCoreObjectDelete = async (context, user, stixCoreObjectId) => {
 
 export const askElementEnrichmentForConnector = async (context, user, elementId, connectorId) => {
   const connector = await storeLoadById(context, user, connectorId, ENTITY_TYPE_CONNECTOR);
+  const element = await internalLoadById(context, user, elementId);
+  if (!element) {
+    throw FunctionalError('Cannot enrich the object, element cannot be found.');
+  }
   const work = await createWork(context, user, connector, 'Manual enrichment', elementId);
   const message = {
     internal: {
@@ -170,6 +185,19 @@ export const askElementEnrichmentForConnector = async (context, user, elementId,
     },
   };
   await pushToConnector(context, connector, message);
+  await publishUserAction({
+    user,
+    event_access: 'extended',
+    event_type: 'command',
+    event_scope: 'enrich',
+    context_data: {
+      id: elementId,
+      connector_id: connectorId,
+      connector_name: connector.name,
+      entity_name: extractEntityRepresentative(element),
+      entity_type: element.entity_type
+    }
+  });
   return work;
 };
 
@@ -242,9 +270,9 @@ export const stixCoreObjectsExportAsk = async (context, user, args) => {
   const works = await askListExport(context, user, format, type, selectedIds, listParams, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w));
 };
-export const stixCoreObjectExportAsk = async (context, user, args) => {
-  const { format, stixCoreObjectId = null, exportType = null, maxMarkingDefinition = null } = args;
-  const entity = stixCoreObjectId ? await storeLoadById(context, user, stixCoreObjectId, ABSTRACT_STIX_CORE_OBJECT) : null;
+export const stixCoreObjectExportAsk = async (context, user, stixCoreObjectId, args) => {
+  const { format, exportType = null, maxMarkingDefinition = null } = args;
+  const entity = await storeLoadById(context, user, stixCoreObjectId, ABSTRACT_STIX_CORE_OBJECT);
   const works = await askEntityExport(context, user, format, entity, exportType, maxMarkingDefinition);
   return works.map((w) => workToExportFile(w));
 };
@@ -254,9 +282,22 @@ export const stixCoreObjectsExportPush = async (context, user, type, file, listF
   await upload(context, user, `export/${type}`, file, { meta });
   return true;
 };
+
 export const stixCoreObjectExportPush = async (context, user, entityId, file) => {
-  const entity = await internalLoadById(context, user, entityId);
-  await upload(context, user, `export/${entity.entity_type}/${entityId}`, file, { entity });
+  const previous = await storeLoadByIdWithRefs(context, user, entityId);
+  if (!previous) {
+    throw UnsupportedError('Cant upload a file an none existing element', { entityId });
+  }
+  const path = `export/${previous.entity_type}/${entityId}`;
+  const up = await upload(context, user, path, file, { entity: previous });
+  const contextData = buildContextDataForFile(null, path, up.name);
+  await publishUserAction({
+    user,
+    event_type: 'file',
+    event_access: 'extended',
+    event_scope: 'create',
+    context_data: contextData
+  });
   return true;
 };
 
@@ -356,7 +397,7 @@ export const stixCoreObjectImportDelete = async (context, user, fileId) => {
     // Stream event generation
     const instance = { ...previous, x_opencti_files: files };
     await storeUpdateEvent(context, user, previous, instance, `removes \`${up.name}\` in \`files\``);
-    return true;
+    return up;
   } catch (err) {
     if (err.name === TYPE_LOCK_ERROR) {
       throw LockTimeoutError({ participantIds });
