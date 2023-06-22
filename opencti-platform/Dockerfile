@@ -45,6 +45,7 @@ RUN yarn install
 COPY opencti-front /opt/opencti-build/opencti-front
 COPY opencti-graphql/config/schema/opencti.graphql /opt/opencti-build/opencti-graphql/config/schema/opencti.graphql
 
+RUN yarn add ckeditor5-custom-build
 RUN yarn build:standalone
 
 
