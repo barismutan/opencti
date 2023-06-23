@@ -132,8 +132,11 @@ export const getParentTypes = (type) => {
       }
     }
   }
+
+
   if (parentTypes.length === 0) {
-    throw DatabaseError(`Type ${type} not supported`);
+    parentTypes.push(ABSTRACT_BASIC_OBJECT);
+    //  throw DatabaseError(`Type ${type} not supported`);
   }
 
   return parentTypes;
